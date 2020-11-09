@@ -5,9 +5,9 @@ exports.up = function (knex) {
         articlesTable.increments('article_id').primary();
         articlesTable.text('title');
         articlesTable.text('body');
-        articlesTable.integer('votes');
-        articlesTable.text('topic').references('topics.slug');
-        articlesTable.text('author').references('users.username');
+        articlesTable.integer('votes').defaultTo(0);
+        articlesTable.text('topic').references('slug').inTable('topics');
+        articlesTable.text('author').references('username').inTable('users');
         articlesTable.timestamp('created_at');
     })
 };

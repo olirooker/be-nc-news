@@ -2,8 +2,8 @@
 exports.up = function (knex) {
     console.log('creating topics table...');
     return knex.schema.createTable('topics', (topicsTable) => {
-        topicsTable.text('slug').primary();
-        topicsTable.text('description');
+        topicsTable.string('slug').unique().primary();
+        topicsTable.string('description');
     })
 };
 

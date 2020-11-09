@@ -9,7 +9,8 @@
     "test": "jest",
     "migrate-make": "knex migrate:make",
     "migrate-latest": "knex migrate:latest",
-    "migrate-rollback": "knex migrate:rollback"
+    "migrate-rollback": "knex migrate:rollback",
+    "test-funcs": "jest utils.test.js"
   },
   "repository": {
     "type": "git",
