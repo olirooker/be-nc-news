@@ -30,7 +30,8 @@ const formatCommentData = (commentData, articleRef) => {
         const newComment = {
             ...restOfData,
             article_id: articleRef[belongs_to],
-            created_at: new Date(created_at)
+            created_at: new Date(created_at),
+            author: created_by
         }
         return newComment
     })

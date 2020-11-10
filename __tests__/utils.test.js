@@ -129,6 +129,7 @@ describe.only("formatting the comment data", () => {
                 body:
                     "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
                 article_id: 1,
+                author: "butter_bridge",
                 votes: 16,
                 created_at: new Date(1511354163389),
             },
@@ -136,6 +137,7 @@ describe.only("formatting the comment data", () => {
                 body:
                     'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
                 article_id: 2,
+                author: "butter_bridge",
                 votes: 14,
                 created_at: new Date(1479818163389),
             }
