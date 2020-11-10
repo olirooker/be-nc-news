@@ -17,20 +17,16 @@ exports.seed = function (knex) {
     })
     .then((userRows) => {
       console.log(`inserted ${userRows.length} users`);
-      // console.log(userRows)
       const formattedArticleData = formatArticleData(data.articleData)
       return knex.insert(formattedArticleData).into('articles').returning('*');
     })
     .then((articleRows) => {
       console.log(`inserted ${articleRows.length} articles`);
-      // console.log(articleRows)
       const articleRef = createArticleRef(articleRows)
       const formattedCommentsData = formatCommentData(data.commentData, articleRef)
-      console.log(formattedCommentsData)
       return knex.insert(formattedCommentsData).into('comments').returning('*');
     })
     .then((commentRows) => {
       console.log(`inserted ${commentRows.length} comments`);
-      console.log(commentRows)
     })
 };

@@ -10,7 +10,8 @@
     "migrate-make": "knex migrate:make",
     "migrate-latest": "knex migrate:latest",
     "migrate-rollback": "knex migrate:rollback",
-    "test-funcs": "jest utils.test.js"
+    "test-funcs": "jest utils.test.js",
+    "test-app": "jest app.test.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "pg": "^8.4.2"
   },
   "devDependencies": {
-    "jest": "^26.6.3"
+    "jest": "^26.6.3",
+    "supertest": "^6.0.1"
   }
 }
