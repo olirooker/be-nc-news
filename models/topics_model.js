@@ -1,14 +1,10 @@
 const connection = require("../db/connection")
 
-
-const fetchTopics = () => {
+exports.fetchTopics = () => {
     return connection
         .select('*')
         .from('topics')
         .then(topicRows => {
-            return { topics: topicRows }
+            return topicRows;
         })
 }
-
-
-module.exports = { fetchTopics }
