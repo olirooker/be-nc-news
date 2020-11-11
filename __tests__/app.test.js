@@ -96,24 +96,70 @@ describe("northcoders news api", () => {
                         created_at: '2018-11-15T12:21:54.171Z',
                         comment_count: '13'
                     });
-
-                    // need to add this:
-                    // comment_count
                 })
         });
 
-        test.only('PATCH 201 - request body takes an object to update the votes property, responds with the updates article', () => {
+        test('GET 200 - responds with comment_count as 0 if the article has no comments', () => {
+            return request(app)
+                .get('/api/articles/3')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.article[0].comment_count).toEqual('0');
+                })
+        });
+
+        test('PATCH 201 - increase vote property of an article. accepts an object to increase the votes property by and responds with the updated article', () => {
+
+            // /api/articles/1 has 100 votes
+            // should return 101
 
             const votesToPatch = {
                 votes: 1
             };
 
             return request(app)
-                .patch('/api/articles/3')
+                .patch('/api/articles/1')
                 .send(votesToPatch)
                 .expect(201)
                 .then(response => {
-                    // console.log(response.body)
+                    // assert the votes have increased by the given number
+                    expect(response.body.article[0].votes).toEqual(101);
+                    // assert the full updated article is returned
+                    expect(response.body.article[0]).toEqual({
+                        article_id: 1,
+                        title: 'Living in the shadow of a great man',
+                        body: 'I find this existence challenging',
+                        votes: 101,
+                        topic: 'mitch',
+                        author: 'butter_bridge',
+                        created_at: '2018-11-15T12:21:54.171Z'
+                    });
+                })
+        });
+
+        test('PATCH 201 - decrease vote property of an article. test if the current functionality can decrease the votes passing through a negative number', () => {
+
+            const votesToPatch = {
+                votes: -1
+            };
+
+            return request(app)
+                .patch('/api/articles/1')
+                .send(votesToPatch)
+                .expect(201)
+                .then(response => {
+                    // assert the votes have increased by the given number
+                    expect(response.body.article[0].votes).toEqual(99);
+                    // assert the full updated article is returned
+                    expect(response.body.article[0]).toEqual({
+                        article_id: 1,
+                        title: 'Living in the shadow of a great man',
+                        body: 'I find this existence challenging',
+                        votes: 99,
+                        topic: 'mitch',
+                        author: 'butter_bridge',
+                        created_at: '2018-11-15T12:21:54.171Z'
+                    });
                 })
         });
 
