@@ -4,12 +4,13 @@ const articleRef = require("../seeds/seed")
 const formatArticleData = (arrOfData) => {
     const formattedData = arrOfData.map(({ created_at, ...restOfArticle }) => {
         const newTimestamp = new Date(created_at)
+        // could remove this variable and move into the object
 
         const newArticle = {
             ...restOfArticle,
             created_at: newTimestamp
+            // created_at: new Date(created_at)
         }
-
         return newArticle
     })
     return formattedData
@@ -22,7 +23,6 @@ const createArticleRef = (articleData) => {
     })
     return ref
 }
-
 
 const formatCommentData = (commentData, articleRef) => {
 
@@ -37,8 +37,5 @@ const formatCommentData = (commentData, articleRef) => {
     })
     return formattedData
 }
-
-
-
 
 module.exports = { formatArticleData, createArticleRef, formatCommentData }

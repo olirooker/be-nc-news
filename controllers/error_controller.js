@@ -12,6 +12,6 @@
 
 // handle all other errors
 exports.handleServerErrors = (err, req, res, next) => {
-    console.log(err, 'error to handle');
+    console.log(err, '<<<< error to handle');
     res.status(500).send({ msg: 'Internal Server Error' })
 }

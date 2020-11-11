@@ -6,4 +6,12 @@ exports.getArticleById = (req, res, next) => {
         res.status(200).send({ article })
     })
         .catch(next)
-}
+};
+
+exports.patchArticleVotesById = (req, res, next) => {
+    const article_id = req.params.article_id;
+    const increaseVoteByOne = req.body;
+
+    console.log(article_id, '<<<<< params article_id')
+    console.log(increaseVoteByOne, '<<<<< req body')
+};

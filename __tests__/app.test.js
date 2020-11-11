@@ -61,25 +61,62 @@ describe("northcoders news api", () => {
                     expect(response.body).toMatchObject({ user: expect.any(Array) })
                     // assert the response has the correct properties
                     expect(Object.keys(response.body.user[0])).toEqual(expect.arrayContaining(['username', 'avatar_url', 'name']))
+
+                    // like this or above?
+                    expect(response.body.user[0]).toEqual({
+                        username: 'butter_bridge',
+                        avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+                        name: 'jonny'
+                    })
                 })
         });
     });
 
-    describe.only('/api/articles/:article_id', () => {
-        test('GET 200 - responds with an array of a given article', () => {
+    describe('/api/articles/:article_id', () => {
+        test('GET 200 - responds with an array of a given article, including a count of how many comments the article has', () => {
             return request(app)
-                .get('/api/articles/2')
+                .get('/api/articles/1')
                 .expect(200)
                 .then(response => {
-                    // console.log(response.body)
                     // assert the response has the correct number of rows
                     expect(response.body.article.length).toEqual(1);
                     // assert the response is the correct shape
                     expect(response.body).toMatchObject({ article: expect.any(Array) })
                     // assert the response has the correct properties
-                    expect(Object.keys(response.body.article[0])).toEqual(expect.arrayContaining(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at']))
+                    expect(Object.keys(response.body.article[0])).toEqual(expect.arrayContaining(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at', 'comment_count']))
+
+                    // this or above?
+                    expect(response.body.article[0]).toEqual({
+                        article_id: 1,
+                        title: 'Living in the shadow of a great man',
+                        body: 'I find this existence challenging',
+                        votes: 100,
+                        topic: 'mitch',
+                        author: 'butter_bridge',
+                        created_at: '2018-11-15T12:21:54.171Z',
+                        comment_count: '13'
+                    });
+
+                    // need to add this:
+                    // comment_count
                 })
         });
+
+        test.only('PATCH 201 - request body takes an object to update the votes property, responds with the updates article', () => {
+
+            const votesToPatch = {
+                votes: 1
+            };
+
+            return request(app)
+                .patch('/api/articles/3')
+                .send(votesToPatch)
+                .expect(201)
+                .then(response => {
+                    // console.log(response.body)
+                })
+        });
+
     });
 
 })
