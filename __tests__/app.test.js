@@ -5,7 +5,6 @@ const { response } = require("express");
 
 
 describe("northcoders news api", () => {
-
     // hooks
     afterAll(() => {
         return connection.destroy();
@@ -70,6 +69,15 @@ describe("northcoders news api", () => {
                     })
                 })
         });
+
+        test('GET 404 - responds with a 404 when the user does not exist', () => {
+            return request(app)
+                .get('/api/users/not-a-user')
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('User not found!');
+                })
+        });
     });
 
     describe('/api/articles/:article_id', () => {
@@ -108,7 +116,26 @@ describe("northcoders news api", () => {
                 })
         });
 
-        test('PATCH 201 - increase vote property of an article. accepts an object to increase the votes property by and responds with the updated article', () => {
+        // 404 there is nothing wrong with the request it just doesn't exist.
+        test('GET 404 - responds with 404 custom error the article_id does not exist', () => {
+            return request(app)
+                .get('/api/articles/100')
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Article not found!');
+                })
+        });
+
+        test('GET 400 - responds with 400 if bad request is made. PSQL error', () => {
+            return request(app)
+                .get('/api/articles/cats')
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Bad request');
+                })
+        });
+
+        test('PATCH 201 - increase vote property of an article. Accepts an object with votes property, responds with the updated article', () => {
 
             // /api/articles/1 has 100 votes
             // should return 101
@@ -137,7 +164,7 @@ describe("northcoders news api", () => {
                 })
         });
 
-        test('PATCH 201 - decrease vote property of an article. test if the current functionality can decrease the votes passing through a negative number', () => {
+        test('PATCH 201 - decrease vote property of an article. Decrease the votes passing through a negative number', () => {
 
             const votesToPatch = {
                 votes: -1
@@ -163,6 +190,105 @@ describe("northcoders news api", () => {
                 })
         });
 
+        // test('PATCH No votes on the req body', () => {
+        //     const votesToPatch = {
+        //         votes: 
+        //     };
+
+        //     return request(app)
+        //         .patch('/api/articles/1')
+        //         .send(votesToPatch)
+        //         .expect()
+        // });
+
+        test('PATCH 400 - responds with a 400 if you provide an invalid value', () => {
+            const votesToPatch = {
+                votes: 'cats'
+            };
+
+            return request(app)
+                .patch('/api/articles/1')
+                .send(votesToPatch)
+                .expect(400)
+        });
+
+        test('DELETE 204 - removes an article by id', () => {
+            // what happens onDelete??
+            return request(app)
+                .delete('/api/articles/1')
+                .expect(204)
+                .then(response => {
+                    return request(app)
+                        .get('/api/articles')
+                        .expect(200)
+                        .then(response => {
+                            expect(response.body.articles.length).toEqual(11);
+                        })
+                })
+        });
+
+        test('DELETE 404 - responds with a 404 customer error when attempting to delete an article that does not exist', () => {
+            return request(app)
+                .delete('/api/articles/100')
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Article not found! Cannot delete.');
+                })
+        });
+    }); // end of /api/articles/:article_id
+
+    describe('/api/articles', () => {
+        test('GET 200 - responds with an array of all the articles sorted by created_at most recent first by default', () => {
+            return request(app)
+                .get('/api/articles')
+                .expect(200)
+                .then(response => {
+                    // assert the response has the correct number of rows
+                    expect(response.body.articles.length).toEqual(12);
+                    // assert the response is the correct shape
+                    expect(response.body).toMatchObject({ articles: expect.any(Array) })
+                    // assert the response has the correct properties
+                    expect(Object.keys(response.body.articles[0])).toEqual(expect.arrayContaining(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at', 'comment_count']))
+
+                    // assert the response
+                    expect(response.body.articles).toBeSortedBy('created_at', { coerce: true });
+                });
+        });
+
+        // next test here
+
     });
 
-})
+    describe('Unavailable Routes and Invalid Methods', () => {
+        // 404 there is nothing wrong with the request it just doesn't exist.
+        test('GET 404 - responds with 404 custom error when route is not available', () => {
+            return request(app)
+                .get('/not-a-route')
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Route not found!');
+                })
+        });
+
+        test('INVALID METHOD 405 - responds with 405 custom error when the request method in not allowed', () => {
+
+        });
+    });
+
+    describe('/api/articles/:article_id/comments', () => {
+        test('POST 201 - accepts a new comment object and responds with the posted comment', () => {
+
+            // request body accepts an object with username and body properties
+            // responds with the posted comment
+
+            const newComment = {
+                username: 'name',
+                body: 'text'
+            }
+
+        });
+
+
+    });
+
+}); // end of all tests
