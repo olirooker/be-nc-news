@@ -6,6 +6,7 @@ const articlesRouter = require("../routers/articles_router");
 
 exports.fetchCommentsForArticle = (sortBy = 'created_at', order = 'desc', articleId) => {
 
+    // console.log(order, '<<<<<< model')
     return connection
         .select('comment_id', 'votes', 'created_at', 'author', 'body')
         .from('comments')
