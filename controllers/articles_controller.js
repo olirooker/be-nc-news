@@ -12,7 +12,10 @@ exports.getArticleById = (req, res, next) => {
 
 exports.patchArticleVotesById = (req, res, next) => {
     const articleId = req.params.article_id;
-    const voteChange = req.body;
+    const voteChange = req.body.votes;
+
+    if (voteChange === undefined) return Promise.reject({ status: 400, msg: 'No votes on the request!' })
+        .catch(next)
 
     updateArticleVotesById(articleId, voteChange).then(article => {
         res.status(201).send({ article })
@@ -27,6 +30,7 @@ exports.deleteArticleById = (req, res, next) => {
     })
         .catch(next)
 };
+
 
 
 // ---------- All Articles ---------- //

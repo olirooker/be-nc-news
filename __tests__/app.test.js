@@ -190,18 +190,22 @@ describe("northcoders news api", () => {
                 })
         });
 
-        // test('PATCH No votes on the req body', () => {
-        //     const votesToPatch = {
-        //         votes: 
-        //     };
+        test('PATCH 400 - No votes on the req body - the property is not defined', () => {
+            //  route to handleCustomErrors
 
-        //     return request(app)
-        //         .patch('/api/articles/1')
-        //         .send(votesToPatch)
-        //         .expect()
-        // });
+            const votesToPatch = { name: 'Oli' };
 
-        test('PATCH 400 - responds with a 400 if you provide an invalid value', () => {
+            return request(app)
+                .patch('/api/articles/1')
+                .send(votesToPatch)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('No votes on the request!');
+                })
+        });
+
+        test('PATCH 400 - responds with 400 bad request when provided with an invalid value', () => {
+            //handled by handlePSQLErrors
             const votesToPatch = {
                 votes: 'cats'
             };
@@ -210,6 +214,36 @@ describe("northcoders news api", () => {
                 .patch('/api/articles/1')
                 .send(votesToPatch)
                 .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Bad request');
+                })
+        });
+
+        test('PATCH 201 - only patches the votes property even if there is another property on the request', () => {
+            // this just ignores the other property as the model can only patch the votes property and nothing else.
+            const votesToPatch = {
+                votes: 5,
+                name: 'Mitch'
+            };
+
+            return request(app)
+                .patch('/api/articles/1')
+                .send(votesToPatch)
+                .expect(201)
+                .then(response => {
+                    // assert the votes have increased by the given number
+                    expect(response.body.article[0].votes).toEqual(105);
+                    // assert the full updated article is returned
+                    expect(response.body.article[0]).toEqual({
+                        article_id: 1,
+                        title: 'Living in the shadow of a great man',
+                        body: 'I find this existence challenging',
+                        votes: 105,
+                        topic: 'mitch',
+                        author: 'butter_bridge',
+                        created_at: '2018-11-15T12:21:54.171Z'
+                    });
+                });
         });
 
         test('DELETE 204 - removes an article by id', () => {
@@ -276,6 +310,79 @@ describe("northcoders news api", () => {
     });
 
     describe('/api/articles/:article_id/comments', () => {
+
+        test('GET 200 - responds with an array of comments for the given article_id', () => {
+            return request(app)
+                .get('/api/articles/1/comments')
+                .expect(200)
+                .then(response => {
+                    // assert the response has the correct number of rows
+                    expect(response.body.comments.length).toEqual(13);
+                    // assert the response is the correct shape
+                    expect(response.body).toMatchObject({ comments: expect.any(Array) })
+                    // assert the response has the correct properties
+                    expect(Object.keys(response.body.comments[0])).toEqual(expect.arrayContaining(['comment_id', 'votes', 'created_at', 'author', 'body']))
+                })
+        });
+
+        test('GET 200 - responds with an array of comments with default sorting and ordering', () => {
+            return request(app)
+                .get('/api/articles/1/comments')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.comments).toBeSortedBy('created_at', { coerce: true });
+                })
+        });
+
+        test('GET 200 - responds with an array of comments sorted by a valid column when queried', () => {
+            return request(app)
+                .get('/api/articles/1/comments?sort_by=votes')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.comments).toBeSortedBy('votes', { descending: true, coerce: true });
+                    expect(response.body.comments[0].votes).toEqual(100);
+                })
+        });
+
+        test('GET 400 - responds with a 400 for a request made to sort by an invalid column', () => {
+            return request(app)
+                .get('/api/articles/1/comments?sort_by=totes')
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Bad request')
+                })
+        });
+
+        test('GET 200 - responds with an array of comments order ascending when queried', () => {
+
+            return request(app)
+                .get('/api/articles/1/comments?order=asc')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.comments).toBeSortedBy('created_at', { descending: false, coerce: true });
+                })
+        });
+
+        test('GET 400 - responds with an 400 when ordering by an invalid value', () => {
+
+            return request(app)
+                .get('/api/articles/1/comments?order=cats')
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Invalid order request');
+                })
+        });
+
+        test('GET 200 - responds with comments array with chained queries. ordered and sort by', () => {
+
+            return request(app)
+                .get('/api/articles/1/comments?sort_by=author&order=asc')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.comments).toBeSortedBy('author', { descending: false, coerce: true });
+                })
+        });
+
         test('POST 201 - accepts a new comment object and responds with the posted comment', () => {
 
             // request body accepts an object with username and body properties
@@ -289,6 +396,6 @@ describe("northcoders news api", () => {
         });
 
 
-    });
+    }); // end of /api/articles/:article_id/comments
 
 }); // end of all tests

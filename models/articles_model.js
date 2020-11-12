@@ -31,7 +31,7 @@ exports.updateArticleVotesById = (articleId, voteChange) => {
         .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
         .groupBy('articles.article_id')
         .where('articles.article_id', '=', articleId)
-        .increment('votes', voteChange.votes)
+        .increment('votes', voteChange)
         .returning('*')
         .then(updatedArticle => {
             return updatedArticle
@@ -51,6 +51,7 @@ exports.removeArticleById = (articleId) => {
             }
         })
 };
+
 
 
 // ---------- All Articles ---------- //
