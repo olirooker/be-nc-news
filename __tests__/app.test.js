@@ -261,7 +261,7 @@ describe("northcoders news api", () => {
     }); // end of /api/articles/:article_id
 
     describe('/api/articles', () => {
-        test.only('GET 200 - responds with an array of all the articles sorted by created_at most recent first by default', () => {
+        test('GET 200 - responds with an array of all the articles sorted by created_at most recent first by default', () => {
             return request(app)
                 .get('/api/articles')
                 .expect(200)
@@ -293,7 +293,7 @@ describe("northcoders news api", () => {
                 });
         });
 
-        test.only('GET 200 - responds with an array of articles written by the same author', () => {
+        test('GET 200 - responds with an array of articles written by the same author', () => {
             return request(app)
                 .get('/api/articles?username=icellusedkars')
                 .expect(200)
@@ -301,6 +301,18 @@ describe("northcoders news api", () => {
                     console.log(response.body.articles)
                     response.body.articles.forEach(article => {
                         expect(article.author).toEqual('icellusedkars');
+                    })
+                });
+        });
+
+        test('GET 200 - responds with an array of articles filtered by topic', () => {
+            return request(app)
+                .get('/api/articles?topic=cats')
+                .expect(200)
+                .then(response => {
+                    console.log(response.body.articles)
+                    response.body.articles.forEach(article => {
+                        expect(article.topic).toEqual('cats');
                     })
                 });
         });
@@ -435,7 +447,7 @@ describe("northcoders news api", () => {
                 .send(newComment)
                 .expect(404)
                 .then(response => {
-                    expect(response.body.msg).toEqual('User not found!');
+                    expect(response.body.msg).toEqual('Not found!');
                 })
         });
 
@@ -450,7 +462,7 @@ describe("northcoders news api", () => {
                 .send(newComment)
                 .expect(400)
                 .then(response => {
-                    expect(response.body.msg).toEqual('No username on the request!');
+                    expect(response.body.msg).toEqual('Missing information on the request!');
                 })
         });
 
@@ -464,7 +476,7 @@ describe("northcoders news api", () => {
                 .send(newComment)
                 .expect(400)
                 .then(response => {
-                    expect(response.body.msg).toEqual('No body on the request!');
+                    expect(response.body.msg).toEqual('Missing information on the request!');
                 })
         });
 
@@ -491,5 +503,87 @@ describe("northcoders news api", () => {
 
 
     }); // end of /api/articles/:article_id/comments
+
+    describe('/api/comments/:comment_id', () => {
+        test('PATCH 201 - request body accepts an object which increases the vote property of the comment, responds with the updated comment', () => {
+            const votesToPatch = {
+                inc_votes: 1
+            };
+
+            return request(app)
+                .patch('/api/comments/4')
+                .send(votesToPatch)
+                .expect(201)
+                .then(response => {
+                    // assert the votes have increased by the given number
+                    expect(response.body.comment[0].votes).toEqual(-99);
+                    // assert the full updated comment is returned
+                    expect(response.body.comment[0]).toEqual({
+                        comment_id: 4,
+                        author: 'icellusedkars',
+                        article_id: 1,
+                        votes: -99,
+                        created_at: '2014-11-23T12:36:03.389Z',
+                        body: ' I carry a log — yes. Is it funny to you? It is not to me.'
+                    });
+                })
+        });
+
+        test('PATCH 201 - request body accepts an object which decreases the vote property of the comment, responds with the updated comment', () => {
+            const votesToPatch = {
+                inc_votes: -1
+            };
+
+            return request(app)
+                .patch('/api/comments/4')
+                .send(votesToPatch)
+                .expect(201)
+                .then(response => {
+                    // assert the votes have increased by the given number
+                    expect(response.body.comment[0].votes).toEqual(-101);
+                    // assert the full updated comment is returned
+                    expect(response.body.comment[0]).toEqual({
+                        comment_id: 4,
+                        author: 'icellusedkars',
+                        article_id: 1,
+                        votes: -101,
+                        created_at: '2014-11-23T12:36:03.389Z',
+                        body: ' I carry a log — yes. Is it funny to you? It is not to me.'
+                    });
+                })
+        });
+
+
+
+        test('DELETE 204 - delete the given comment by comment_id, responds with 204 and no content', () => {
+            return request(app)
+                .delete('/api/comments/4')
+                .expect(204)
+                .then(response => {
+                    return request(app)
+                        .get('/api/articles/1')
+                        .expect(200)
+                        .then(response => {
+                            expect(response.body.article[0].comment_count).toEqual('12');
+                        })
+                })
+        });
+
+        test.only('DELETE 404 - responds with 404 when attempting to delete a comment that does not exist', () => {
+            return request(app)
+                .delete('/api/comments/100')
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Comment not found! Cannot delete.');
+                })
+
+
+
+        });
+
+    }); // end of /api/comments/:comment_id
+
+
+
 
 }); // end of all tests

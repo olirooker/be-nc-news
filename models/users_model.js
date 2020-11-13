@@ -3,7 +3,7 @@ const connection = require("../db/connection")
 exports.fetchUsersByUsername = (username) => {
 
     if (username === undefined) {
-        return Promise.reject({ status: 400, msg: 'No username on the request!' })
+        return Promise.resolve([])
     } else {
         return connection
             .select('*')

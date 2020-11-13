@@ -1,4 +1,4 @@
-const { fetchCommentsForArticle, addCommentToArticleById } = require('../models/comments_model');
+const { fetchCommentsForArticle, addCommentToArticleById, updateCommentVotesById, removeCommentById } = require('../models/comments_model');
 const { fetchUsersByUsername } = require('../models/users_model');
 
 
@@ -26,13 +26,41 @@ exports.postCommentToArticleById = (req, res, next) => {
     const username = req.body.username
     const body = req.body.body
 
-    fetchUsersByUsername(username)
-        .then(username => {
-            addCommentToArticleById(username, body, articleId)
-                .then(postedComment => {
-                    res.status(201).send({ postedComment })
-                })
-                .catch(next)
+    // fetchUsersByUsername(username)
+    //     .then(username => {
+
+    addCommentToArticleById(username, body, articleId)
+        .then(postedComment => {
+            res.status(201).send({ postedComment })
         })
         .catch(next)
+
+    // })
+    // .catch (next)
+};
+
+
+
+// ---------- Comments Endpoints ---------- //
+
+exports.patchCommentVotesById = (req, res, next) => {
+
+    const commentId = req.params.comment_id
+    const votesToAdd = req.body
+
+    updateCommentVotesById(commentId, votesToAdd).then(comment => {
+        res.status(201).send({ comment })
+    })
+        .catch(next)
+};
+
+exports.deleteCommentById = (req, res, next) => {
+
+    const commentId = req.params.comment_id
+
+    removeCommentById(commentId).then(() => {
+        res.status(204).send()
+    })
+        .catch(next)
+
 };

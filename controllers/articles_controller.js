@@ -42,23 +42,20 @@ exports.getAllArticles = (req, res, next) => {
     const sortBy = req.query.sort_by
     const order = req.query.order
     const username = req.query.username
+    const topic = req.query.topic
 
-    console.log(username, '<<<< username in the controller')
-
-    // if (username) {
     fetchUsersByUsername(username)
         .then(username => {
-            const user = username[0].username
-            console.log(user, '<<<<< after the fetch user function controller')
-            fetchAllArticles(sortBy, order, user).then(articles => {
-                res.status(200).send({ articles })
-            })
-                .catch(next)
+            const user = username[0]?.username
+            return fetchAllArticles(sortBy, order, user, topic)
+        })
+        .then(articles => {
+            res.status(200).send({ articles })
         })
         .catch(next)
     // }
 
-    // fetchAllArticles(sortBy, order).then(articles => {
+    // fetchAllArticles(sortBy, order, username, topic).then(articles => {
     //     res.status(200).send({ articles })
     // })
     //     .catch(next)

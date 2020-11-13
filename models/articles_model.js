@@ -56,7 +56,7 @@ exports.removeArticleById = (articleId) => {
 
 // ---------- All Articles ---------- //
 
-exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user) => {
+exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) => {
 
     console.log(user, '<<<<< username in model')
 
@@ -69,6 +69,9 @@ exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user) => {
         .modify(queryBuilder => {
             if (user) {
                 queryBuilder.where('articles.author', '=', user)
+            }
+            if (topic) {
+                queryBuilder.where('articles.topic', '=', topic)
             }
         })
         .orderBy(sortBy, order)
