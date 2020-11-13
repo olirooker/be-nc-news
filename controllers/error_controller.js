@@ -1,7 +1,11 @@
 // handle specific custom errors
 exports.send404 = (req, res, next) => {
     res.status(404).send({ msg: 'Route not found!' })
-}
+};
+
+exports.send405 = (req, res, next) => {
+    res.status(405).send({ msg: 'Method not allowed!' })
+};
 
 // handle things that we want to be errors
 exports.handleCustomErrors = (err, req, res, next) => {
@@ -18,7 +22,7 @@ exports.handlePSQLErrors = (err, req, res, next) => {
     if (badReqCodes.includes(err.code)) {
         res.status(400).send({ msg: 'Bad request' });
     }
-    if (notFoundCodes.includes(err.code)) {
+    else if (notFoundCodes.includes(err.code)) {
         res.status(404).send({ msg: 'Not found!' });
     }
     else next(err)

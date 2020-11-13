@@ -317,6 +317,64 @@ describe("northcoders news api", () => {
                 });
         });
 
+        test('GET 400 - when sorting by an invalid column', () => {
+            return request(app)
+                .get('/api/articles?sort_by=not_a_column')
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Bad request')
+                })
+        });
+
+        // test.only('GET 400 - responds with an 400 when ordering by an invalid value', () => {
+
+        //     return request(app)
+        //         .get('/api/articles?order=cats')
+        //         .expect(200)
+        //         .then(response => {
+        //             console.log(response.body)
+        //             expect(response.body.msg).toEqual('Bad request')
+        //         })
+        // });
+
+        test('GET 404 - responds with 404 when the author is not in the database', () => {
+            return request(app)
+                .get('/api/articles?username=bilbo_baggins')
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('User not found!');
+                });
+        });
+
+        test('GET 404 - responds with 404 when the topic is not in the database', () => {
+            return request(app)
+                .get('/api/articles?topic=mushrooms')
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Article not found!');
+                });
+        });
+
+        // could be more specific on the message 'username has not posted any articles'
+        test('GET 404 - responds with 404 when the author has not posted any articles', () => {
+            return request(app)
+                .get('/api/articles?username=lurker')
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Article not found!');
+                });
+        });
+
+        // again could be more specific with the message - 'no articles for this topic'
+        test('GET 404 - responds with 404 when there are no articles for a valid topic', () => {
+            return request(app)
+                .get('/api/articles?topic=paper')
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Article not found!');
+                });
+        });
+
     });
 
     describe('Unavailable Routes and Invalid Methods', () => {
@@ -331,7 +389,12 @@ describe("northcoders news api", () => {
         });
 
         test('INVALID METHOD 405 - responds with 405 custom error when the request method in not allowed', () => {
-
+            return request(app)
+                .delete('/api/topics')
+                .expect(405)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Method not allowed!');
+                })
         });
     });
 
@@ -386,7 +449,7 @@ describe("northcoders news api", () => {
                 })
         });
 
-        // test('GET 400 - responds with an 400 when ordering by an invalid value', () => {
+        // test.only('GET 400 - responds with an 400 when ordering by an invalid value', () => {
 
         //     return request(app)
         //         .get('/api/articles/1/comments?order=cats')
@@ -553,7 +616,7 @@ describe("northcoders news api", () => {
                 })
         });
 
-
+        // bad request tests on the votesToPatch object
 
         test('DELETE 204 - delete the given comment by comment_id, responds with 204 and no content', () => {
             return request(app)
@@ -569,16 +632,13 @@ describe("northcoders news api", () => {
                 })
         });
 
-        test.only('DELETE 404 - responds with 404 when attempting to delete a comment that does not exist', () => {
+        test('DELETE 404 - responds with 404 when attempting to delete a comment that does not exist', () => {
             return request(app)
                 .delete('/api/comments/100')
                 .expect(404)
                 .then(response => {
                     expect(response.body.msg).toEqual('Comment not found! Cannot delete.');
                 })
-
-
-
         });
 
     }); // end of /api/comments/:comment_id

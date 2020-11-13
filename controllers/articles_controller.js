@@ -16,6 +16,8 @@ exports.patchArticleVotesById = (req, res, next) => {
     const articleId = req.params.article_id;
     const voteChange = req.body.votes;
 
+    // how can I do this with only one catch block?
+
     if (voteChange === undefined) return Promise.reject({ status: 400, msg: 'No votes on the request!' })
         .catch(next)
 
@@ -44,6 +46,8 @@ exports.getAllArticles = (req, res, next) => {
     const username = req.query.username
     const topic = req.query.topic
 
+    // console.log(order, 'controller')
+
     fetchUsersByUsername(username)
         .then(username => {
             const user = username[0]?.username
@@ -53,11 +57,5 @@ exports.getAllArticles = (req, res, next) => {
             res.status(200).send({ articles })
         })
         .catch(next)
-    // }
-
-    // fetchAllArticles(sortBy, order, username, topic).then(articles => {
-    //     res.status(200).send({ articles })
-    // })
-    //     .catch(next)
 };
 
