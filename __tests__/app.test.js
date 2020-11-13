@@ -110,6 +110,7 @@ describe("northcoders news api", () => {
         });
 
         // 404 there is nothing wrong with the request it just doesn't exist.
+        // see example from the lecture on Tuesday for a better approach to this.
         test('GET 404 - responds with 404 custom error the article_id does not exist', () => {
             return request(app)
                 .get('/api/articles/100')
@@ -195,7 +196,7 @@ describe("northcoders news api", () => {
                 })
         });
 
-        test('PATCH 400 - responds with 400 bad request when provided with an invalid value', () => {
+        test('PATCH 400 - responds with 400 bad request when provided with an invalid value on the votes object', () => {
             //handled by handlePSQLErrors
             const votesToPatch = {
                 votes: 'cats'

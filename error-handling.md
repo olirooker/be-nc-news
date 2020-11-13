@@ -31,11 +31,11 @@ Bear in mind, handling bad inputs from clients doesn't necessarily have to lead 
 
 ### GET `/not-a-route`
 
-- Status:
+- ✅ Status: 404
 
 ### PATCH / PUT / POST / DELETE... `/api/articles` etc...
 
-- Status:
+- ✅ Status: 405
 
 ---
 
@@ -43,46 +43,70 @@ Bear in mind, handling bad inputs from clients doesn't necessarily have to lead 
 
 ### GET `/api/topics`
 
--
+Added:
+
+- ✅ 404s and 405s covered above
 
 ### GET `/api/users/:username`
 
--
+Added:
+
+- ✅ username does not exist in the database
 
 ### GET `/api/articles/:article_id`
 
-- Bad `article_id` (e.g. `/dog`)
-- Well formed `article_id` that doesn't exist in the database (e.g. `/999999`)
+- ✅ Bad `article_id` (e.g. `/dog`)
+- ✅ Well formed `article_id` that doesn't exist in the database (e.g. `/999999`) - check lecture from Tuesday for a better approach to this
 
 ### PATCH `/api/articles/:article_id`
 
-- No `inc_votes` on request body
-- Invalid `inc_votes` (e.g. `{ inc_votes : "cat" }`)
-- Some other property on request body (e.g. `{ inc_votes : 1, name: 'Mitch' }`)
+- ✅ No `inc_votes` on request body
+- ✅ Invalid `inc_votes` (e.g. `{ inc_votes : "cat" }`)
+- ✅ Some other property on request body (e.g. `{ inc_votes : 1, name: 'Mitch' }`)
+
+### Other `/api/articles/:article_id`
+
+Added:
+
+- order request not equal to asc or desc
 
 ### POST `/api/articles/:article_id/comments`
 
--
+- ✅ user is not in the database
+- ✅ username not defined
+- ✅ additonal properties on the object
+- invalid data types
 
 ### GET `/api/articles/:article_id/comments`
 
--
+Added:
+- ✅ sort by an invalid column
+- `order` !== "asc" / "desc"
 
 ### GET `/api/articles`
 
 - Bad queries:
-  - `sort_by` a column that doesn't exist
+  - ✅  `sort_by` a column that doesn't exist
   - `order` !== "asc" / "desc"
-  - `author` / `topic` that is not in the database
-  - `author` / `topic` that exists but does not have any articles associated with it
+  - ✅  `author` / `topic` that is not in the database
+  - ✅  `author` / `topic` that exists but does not have any articles associated with it - could be better
+
+  Added:
+- ✅ request to delete an article that doesn't exist
 
 ### PATCH `/api/comments/:comment_id`
 
--
+Added:
+
+- user is not in the database
+- username not defined
+- additonal properties on the object
 
 ### DELETE `/api/comments/:comment_id`
 
--
+Added:
+
+- ✅ attempt to delete a comment that doesn't exist
 
 ### GET `/api`
 
