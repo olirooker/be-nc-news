@@ -539,7 +539,7 @@ describe("northcoders news api", () => {
                 .send(votesToPatch)
                 .expect(201)
                 .then(response => {
-                    // assert the votes have increased by the given number
+                    // assert the votes have decreased by the given number
                     expect(response.body.comment[0].votes).toEqual(-101);
                     // assert the full updated comment is returned
                     expect(response.body.comment[0]).toEqual({
