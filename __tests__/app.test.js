@@ -1,7 +1,8 @@
 const connection = require("../db/connection")
 const app = require("../app")
 const request = require("supertest");
-const { response } = require("express");
+// const { response } = require("express");
+// line 4 appeared - what is this?
 
 
 describe("northcoders news api", () => {
@@ -54,14 +55,10 @@ describe("northcoders news api", () => {
                 .get('/api/users/butter_bridge')
                 .expect(200)
                 .then(response => {
-                    // assert the response has the correct number of rows
                     expect(response.body.user.length).toEqual(1);
-                    // assert the response is the correct shape
                     expect(response.body).toMatchObject({ user: expect.any(Array) })
-                    // assert the response has the correct properties
                     expect(Object.keys(response.body.user[0])).toEqual(expect.arrayContaining(['username', 'avatar_url', 'name']))
 
-                    // like this or above?
                     expect(response.body.user[0]).toEqual({
                         username: 'butter_bridge',
                         avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
@@ -86,14 +83,10 @@ describe("northcoders news api", () => {
                 .get('/api/articles/1')
                 .expect(200)
                 .then(response => {
-                    // assert the response has the correct number of rows
                     expect(response.body.article.length).toEqual(1);
-                    // assert the response is the correct shape
                     expect(response.body).toMatchObject({ article: expect.any(Array) })
-                    // assert the response has the correct properties
                     expect(Object.keys(response.body.article[0])).toEqual(expect.arrayContaining(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at', 'comment_count']))
 
-                    // this or above?
                     expect(response.body.article[0]).toEqual({
                         article_id: 1,
                         title: 'Living in the shadow of a great man',
@@ -175,9 +168,7 @@ describe("northcoders news api", () => {
                 .send(votesToPatch)
                 .expect(201)
                 .then(response => {
-                    // assert the votes have increased by the given number
                     expect(response.body.article[0].votes).toEqual(99);
-                    // assert the full updated article is returned
                     expect(response.body.article[0]).toEqual({
                         article_id: 1,
                         title: 'Living in the shadow of a great man',
@@ -231,9 +222,7 @@ describe("northcoders news api", () => {
                 .send(votesToPatch)
                 .expect(201)
                 .then(response => {
-                    // assert the votes have increased by the given number
                     expect(response.body.article[0].votes).toEqual(105);
-                    // assert the full updated article is returned
                     expect(response.body.article[0]).toEqual({
                         article_id: 1,
                         title: 'Living in the shadow of a great man',
@@ -272,24 +261,49 @@ describe("northcoders news api", () => {
     }); // end of /api/articles/:article_id
 
     describe('/api/articles', () => {
-        test('GET 200 - responds with an array of all the articles sorted by created_at most recent first by default', () => {
+        test.only('GET 200 - responds with an array of all the articles sorted by created_at most recent first by default', () => {
             return request(app)
                 .get('/api/articles')
                 .expect(200)
                 .then(response => {
-                    // assert the response has the correct number of rows
                     expect(response.body.articles.length).toEqual(12);
-                    // assert the response is the correct shape
                     expect(response.body).toMatchObject({ articles: expect.any(Array) })
-                    // assert the response has the correct properties
-                    expect(Object.keys(response.body.articles[0])).toEqual(expect.arrayContaining(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at', 'comment_count']))
+                    expect(Object.keys(response.body.articles[0])).toEqual(expect.arrayContaining(['article_id', 'title', 'votes', 'topic', 'author', 'created_at', 'comment_count']))
 
-                    // assert the response
                     expect(response.body.articles).toBeSortedBy('created_at', { coerce: true });
                 });
         });
 
-        // next test here
+        test('GET 200 - responds with an array of all the articles sorted by any valid column', () => {
+            return request(app)
+                .get('/api/articles?sort_by=topic')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.articles).toBeSortedBy('topic', { coerce: true });
+                });
+        });
+
+        test('GET 200 - responds with an array of all articles ordered ascending', () => {
+            return request(app)
+                .get('/api/articles?order=asc')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.articles).toBeSortedBy('created_at', { descending: false, coerce: true });
+                    expect(response.body.articles[0].created_at).toEqual('1974-11-26T12:21:54.171Z');
+                });
+        });
+
+        test.only('GET 200 - responds with an array of articles written by the same author', () => {
+            return request(app)
+                .get('/api/articles?username=icellusedkars')
+                .expect(200)
+                .then(response => {
+                    console.log(response.body.articles)
+                    response.body.articles.forEach(article => {
+                        expect(article.author).toEqual('icellusedkars');
+                    })
+                });
+        });
 
     });
 
@@ -309,18 +323,15 @@ describe("northcoders news api", () => {
         });
     });
 
-    describe.only('/api/articles/:article_id/comments', () => {
+    describe('/api/articles/:article_id/comments', () => {
 
         test('GET 200 - responds with an array of comments for the given article_id', () => {
             return request(app)
                 .get('/api/articles/1/comments')
                 .expect(200)
                 .then(response => {
-                    // assert the response has the correct number of rows
                     expect(response.body.comments.length).toEqual(13);
-                    // assert the response is the correct shape
                     expect(response.body).toMatchObject({ comments: expect.any(Array) })
-                    // assert the response has the correct properties
                     expect(Object.keys(response.body.comments[0])).toEqual(expect.arrayContaining(['comment_id', 'votes', 'created_at', 'author', 'body']))
                 })
         });
@@ -383,17 +394,100 @@ describe("northcoders news api", () => {
                 })
         });
 
-        test.only('POST 201 - accepts a new comment object and responds with the posted comment', () => {
-
-            // request body accepts an object with username and body properties
-            // responds with the posted comment
+        test('POST 201 - accepts a new comment object and responds with the posted comment', () => {
 
             const newComment = {
-                username: 'name',
-                body: 'text'
+                username: 'icellusedkars',
+                body: 'I don\'t know half of you half as well as I should like; and I like less than half of you half as well as you deserve.'
             }
 
+            return request(app)
+                .post('/api/articles/3/comments')
+                .send(newComment)
+                .expect(201)
+                .then(response => {
+                    expect(response.body.postedComment.length).toEqual(1);
+                    expect(response.body).toMatchObject({ postedComment: expect.any(Array) })
+                    expect(Object.keys(response.body.postedComment[0])).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']))
+
+                    // the new Date() creates different times so this test fails
+
+                    // expect(response.body.postedComment[0]).toEqual({
+                    //     comment_id: 19,
+                    //     author: 'icellusedkars',
+                    //     article_id: 3,
+                    //     votes: 0,
+                    //     created_at: new Date(),
+                    //     body: "I don't know half of you half as well as I should like; and I like less than half of you half as well as you deserve."
+                    // });
+                })
         });
+
+        test('POST 404 - responds with a 404 if the username is not a user', () => {
+
+            const newComment = {
+                username: 'Bilbo_Baggins',
+                body: 'I don\'t know half of you half as well as I should like; and I like less than half of you half as well as you deserve.'
+            };
+
+            return request(app)
+                .post('/api/articles/3/comments')
+                .send(newComment)
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('User not found!');
+                })
+        });
+
+        test('POST 400 - responds with a 400 when the username property is not defined', () => {
+
+            const newComment = {
+                body: 'I don\'t know half of you half as well as I should like; and I like less than half of you half as well as you deserve.'
+            };
+
+            return request(app)
+                .post('/api/articles/3/comments')
+                .send(newComment)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('No username on the request!');
+                })
+        });
+
+        test('POST 400 - responds with a 400 when the body is not defined', () => {
+            const newComment = {
+                username: 'icellusedkars'
+            };
+
+            return request(app)
+                .post('/api/articles/3/comments')
+                .send(newComment)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('No body on the request!');
+                })
+        });
+
+        test('POST 201 - additional properties on the request have no impact on the post', () => {
+
+            const newComment = {
+                username: 'icellusedkars',
+                body: 'I don\'t know half of you half as well as I should like; and I like less than half of you half as well as you deserve.',
+                flamingo: 'bird'
+            }
+
+            return request(app)
+                .post('/api/articles/3/comments')
+                .send(newComment)
+                .expect(201)
+                .then(response => {
+                    expect(Object.keys(response.body.postedComment[0])).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']))
+                });
+        });
+
+        // next test about invalid data types on the username and body properties
+        // the data type should be 'text' - what is invalid on text
+
 
 
     }); // end of /api/articles/:article_id/comments

@@ -56,14 +56,22 @@ exports.removeArticleById = (articleId) => {
 
 // ---------- All Articles ---------- //
 
-exports.fetchAllArticles = (query = 'created_at', order = 'desc') => {
+exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user) => {
+
+    console.log(user, '<<<<< username in model')
+
     return connection
-        .select('articles.*')
+        .select('articles.author', 'title', 'articles.article_id', 'topic', 'articles.created_at', 'articles.votes')
         .count('comments.article_id AS comment_count')
         .from('articles')
         .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
         .groupBy('articles.article_id')
-        .orderBy(query, order)
+        .modify(queryBuilder => {
+            if (user) {
+                queryBuilder.where('articles.author', '=', user)
+            }
+        })
+        .orderBy(sortBy, order)
         .then(articlesRows => {
             if (articlesRows.length === 0) {
                 return Promise.reject({ status: 404, msg: 'Article not found!' })
@@ -71,3 +79,4 @@ exports.fetchAllArticles = (query = 'created_at', order = 'desc') => {
             return articlesRows
         })
 };
+

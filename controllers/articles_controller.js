@@ -1,4 +1,6 @@
 const { fetchArticleById, updateArticleVotesById, removeArticleById, fetchAllArticles } = require('../models/articles_model')
+const { fetchUsersByUsername } = require('../models/users_model')
+
 
 // ---------- Article By ID ---------- //
 
@@ -36,8 +38,29 @@ exports.deleteArticleById = (req, res, next) => {
 // ---------- All Articles ---------- //
 
 exports.getAllArticles = (req, res, next) => {
-    fetchAllArticles().then(articles => {
-        res.status(200).send({ articles })
-    })
+
+    const sortBy = req.query.sort_by
+    const order = req.query.order
+    const username = req.query.username
+
+    console.log(username, '<<<< username in the controller')
+
+    // if (username) {
+    fetchUsersByUsername(username)
+        .then(username => {
+            const user = username[0].username
+            console.log(user, '<<<<< after the fetch user function controller')
+            fetchAllArticles(sortBy, order, user).then(articles => {
+                res.status(200).send({ articles })
+            })
+                .catch(next)
+        })
         .catch(next)
+    // }
+
+    // fetchAllArticles(sortBy, order).then(articles => {
+    //     res.status(200).send({ articles })
+    // })
+    //     .catch(next)
 };
+

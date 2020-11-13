@@ -16,3 +16,42 @@ exports.fetchCommentsForArticle = (sortBy = 'created_at', order = 'desc', articl
             return commentsRows
         })
 };
+
+exports.addCommentToArticleById = (username, body, articleId) => {
+
+    if (body === undefined) {
+        return Promise.reject({ status: 400, msg: 'No body on the request!' })
+    }
+    else {
+        const commentBuilder = {
+            author: username[0].username,
+            article_id: articleId,
+            created_at: new Date(),
+            body: body
+        }
+
+        return connection
+            .insert(commentBuilder)
+            .into('comments')
+            .returning('*')
+            .then(postedComment => {
+                return postedComment
+            })
+    }
+
+
+    // const commentBuilder = {
+    //     author: username[0].username,
+    //     article_id: articleId,
+    //     created_at: new Date(),
+    //     body: body
+    // }
+
+    // return connection
+    //     .insert(commentBuilder)
+    //     .into('comments')
+    //     .returning('*')
+    //     .then(postedComment => {
+    //         return postedComment
+    //     })
+};

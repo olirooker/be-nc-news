@@ -13,8 +13,10 @@
 -- this database as it has been seeded with data.
 
 SELECT articles.*, COUNT(comments.article_id) AS comment_count  FROM articles
-JOIN comments ON comments.article_id = articles.article_id
+LEFT JOIN comments ON comments.article_id = articles.article_id
 GROUP BY articles.article_id;
 
 -- END of query builder
 
+-- what does the comments table look like?
+-- SELECT * FROM comments;
