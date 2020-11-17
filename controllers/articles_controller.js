@@ -1,5 +1,6 @@
 const { fetchArticleById, updateArticleVotesById, removeArticleById, fetchAllArticles } = require('../models/articles_model')
 const { fetchUsersByUsername } = require('../models/users_model')
+const { checkOrderQuery, checkUserExists } = require('./utils')
 
 
 // ---------- Article By ID ---------- //
@@ -41,21 +42,16 @@ exports.deleteArticleById = (req, res, next) => {
 
 exports.getAllArticles = (req, res, next) => {
 
-    const sortBy = req.query.sort_by
-    const order = req.query.order
-    const username = req.query.username
-    const topic = req.query.topic
+    const { sort_by: sortBy, order, username, topic } = req.query
 
-    // console.log(order, 'controller')
-
-    fetchUsersByUsername(username)
-        .then(username => {
-            const user = username[0]?.username
-            return fetchAllArticles(sortBy, order, user, topic)
-        })
-        .then(articles => {
+    if (!checkOrderQuery(order)) {
+        next({ status: 400, msg: 'Bad request: Invalid order query' })
+    }
+    else {
+        fetchAllArticles(sortBy, order, username, topic).then(articles => {
             res.status(200).send({ articles })
         })
-        .catch(next)
+            .catch(next)
+    }
 };
 

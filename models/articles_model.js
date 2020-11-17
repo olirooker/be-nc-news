@@ -1,5 +1,7 @@
 const connection = require("../db/connection");
 const articlesRouter = require("../routers/articles_router");
+const { checkUserExists } = require('./utils')
+
 
 // ---------- Articles By ID ---------- //
 
@@ -58,7 +60,7 @@ exports.removeArticleById = (articleId) => {
 
 exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) => {
 
-    // console.log(order, 'model')
+
 
     return connection
         .select('articles.author', 'title', 'articles.article_id', 'topic', 'articles.created_at', 'articles.votes')

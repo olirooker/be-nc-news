@@ -327,22 +327,23 @@ describe("northcoders news api", () => {
                 })
         });
 
-        // test.only('GET 400 - responds with an 400 when ordering by an invalid value', () => {
+        test('GET 400 - responds with an 400 when ordering by an invalid value', () => {
 
-        //     return request(app)
-        //         .get('/api/articles?order=cats')
-        //         .expect(200)
-        //         .then(response => {
-        //             console.log(response.body)
-        //             expect(response.body.msg).toEqual('Bad request')
-        //         })
-        // });
+            return request(app)
+                .get('/api/articles?order=cats')
+                .expect(400)
+                .then(response => {
+                    console.log(response.body)
+                    expect(response.body.msg).toEqual('Bad request: Invalid order query')
+                })
+        });
 
-        test('GET 404 - responds with 404 when the author is not in the database', () => {
+        xtest('GET 404 - responds with 404 when the author is not in the database', () => {
             return request(app)
                 .get('/api/articles?username=bilbo_baggins')
                 .expect(404)
                 .then(response => {
+                    console.log(response.body)
                     expect(response.body.msg).toEqual('User not found!');
                 });
         });
