@@ -1,6 +1,6 @@
 const connection = require("../db/connection");
 const articlesRouter = require("../routers/articles_router");
-const { checkUserExists } = require('./utils')
+const { checkUserExists, checkExists } = require('./utils')
 
 
 // ---------- Articles By ID ---------- //
@@ -21,7 +21,7 @@ exports.fetchArticleById = (articleId) => {
             if (articleRow.length === 0) {
                 return Promise.reject({ status: 404, msg: 'Article not found!' })
             }
-            return articleRow
+            return articleRow[0]
         })
 };
 
@@ -56,11 +56,9 @@ exports.removeArticleById = (articleId) => {
 
 
 
-// ---------- All Articles ---------- //
+// ---------- All Articles Model ---------- //
 
 exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) => {
-
-
 
     return connection
         .select('articles.author', 'title', 'articles.article_id', 'topic', 'articles.created_at', 'articles.votes')
@@ -79,9 +77,16 @@ exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) 
         .orderBy(sortBy, order)
         .then(articlesRows => {
             if (articlesRows.length === 0) {
-                return Promise.reject({ status: 404, msg: 'Article not found!' })
+                return Promise.all([articlesRows, checkExists('users', 'username', user),
+                    checkExists('topics', 'slug', topic)])
             }
-            return articlesRows
+            return [articlesRows];
+        })
+        .then((response) => {
+            if (response[1] === true && response[2] === true) {
+                return Promise.reject({ status: 404, msg: 'No articles yet!' })
+            }
+            else return response[0]
         })
 };
 

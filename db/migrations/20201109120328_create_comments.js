@@ -4,7 +4,7 @@ exports.up = function (knex) {
     return knex.schema.createTable('comments', (commentsTable) => {
         commentsTable.increments('comment_id').primary();
         commentsTable.text('author').references('username').inTable('users');
-        commentsTable.integer('article_id').references('article_id').inTable('articles').onDelete('set default');
+        commentsTable.integer('article_id').references('article_id').inTable('articles').onDelete('CASCADE');
         commentsTable.integer('votes').defaultTo(0);
         commentsTable.timestamp('created_at');
         commentsTable.text('body');

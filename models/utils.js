@@ -1,13 +1,18 @@
 const connection = require("../db/connection");
 
-exports.checkUserExists = (user) => {
+exports.checkExists = (table, column, query) => {
+
+    if (!query) return true;
+
     return connection
         .select('*')
-        .from('users')
-        .where('username', '=', user)
-        .then(username => {
-            if (username.length === 0) return false
-            else return true
+        .from(table)
+        .where(column, '=', query)
+        .then(result => {
+            if (result.length === 0) {
+                return Promise.reject({ status: 404, msg: `${query}? No articles found!` })
+            }
+            else return true;
         })
 };
 

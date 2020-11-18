@@ -1,6 +1,5 @@
 const { fetchArticleById, updateArticleVotesById, removeArticleById, fetchAllArticles } = require('../models/articles_model')
-const { fetchUsersByUsername } = require('../models/users_model')
-const { checkOrderQuery, checkUserExists } = require('./utils')
+const { checkOrderQuery } = require('./utils')
 
 
 // ---------- Article By ID ---------- //
@@ -17,10 +16,7 @@ exports.patchArticleVotesById = (req, res, next) => {
     const articleId = req.params.article_id;
     const voteChange = req.body.votes;
 
-    // how can I do this with only one catch block?
-
-    if (voteChange === undefined) return Promise.reject({ status: 400, msg: 'No votes on the request!' })
-        .catch(next)
+    if (voteChange === undefined) next({ status: 400, msg: 'No votes on the request!' })
 
     updateArticleVotesById(articleId, voteChange).then(article => {
         res.status(201).send({ article })
@@ -38,7 +34,7 @@ exports.deleteArticleById = (req, res, next) => {
 
 
 
-// ---------- All Articles ---------- //
+// ---------- All Articles Controller ---------- //
 
 exports.getAllArticles = (req, res, next) => {
 
@@ -48,10 +44,10 @@ exports.getAllArticles = (req, res, next) => {
         next({ status: 400, msg: 'Bad request: Invalid order query' })
     }
     else {
-        fetchAllArticles(sortBy, order, username, topic).then(articles => {
-            res.status(200).send({ articles })
-        })
+        fetchAllArticles(sortBy, order, username, topic)
+            .then(articles => {
+                res.status(200).send({ articles })
+            })
             .catch(next)
     }
 };
-

@@ -43,7 +43,7 @@ describe("formatting timestamp", () => {
         }]
         expect(formatArticleData(input)).toEqual(output)
     })
-    test("check original array isn't mutated", () => {
+    test.only("check original array isn't mutated", () => {
         const input = [{
             title: 'Living in the shadow of a great man',
             topic: 'mitch',
@@ -60,8 +60,26 @@ describe("formatting timestamp", () => {
                 'Call me Mitchell...',
             created_at: 1416140514171,
         }]
+
+        const mutationCheck = [{
+            title: 'Living in the shadow of a great man',
+            topic: 'mitch',
+            author: 'butter_bridge',
+            body: 'I find this existence challenging',
+            created_at: 1542284514171,
+            votes: 100,
+        },
+        {
+            title: 'Sony Vaio; or, The Laptop',
+            topic: 'mitch',
+            author: 'icellusedkars',
+            body:
+                'Call me Mitchell...',
+            created_at: 1416140514171,
+        }];
+
         formatArticleData(input)
-        expect(input).toEqual(input)
+        expect(input).toEqual(mutationCheck)
     })
 })
 
@@ -97,7 +115,7 @@ describe("creating article reference object", () => {
     })
 })
 
-describe.only("formatting the comment data", () => {
+describe("formatting the comment data", () => {
     test("given an empty array returns an empty array", () => {
         expect(formatCommentData([])).toEqual([])
     })

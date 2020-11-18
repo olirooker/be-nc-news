@@ -50,16 +50,15 @@ describe("northcoders news api", () => {
     })
 
     describe('/api/users/:username', () => {
-        test('GET 200 - responds with an array of a given user', () => {
+        test('GET 200 - responds with an object of a given user', () => {
             return request(app)
                 .get('/api/users/butter_bridge')
                 .expect(200)
                 .then(response => {
-                    expect(response.body.user.length).toEqual(1);
-                    expect(response.body).toMatchObject({ user: expect.any(Array) })
-                    expect(Object.keys(response.body.user[0])).toEqual(expect.arrayContaining(['username', 'avatar_url', 'name']))
+                    expect(response.body).toMatchObject({ user: expect.any(Object) })
+                    expect(Object.keys(response.body.user)).toEqual(expect.objectContaining(['username', 'avatar_url', 'name']))
 
-                    expect(response.body.user[0]).toEqual({
+                    expect(response.body.user).toEqual({
                         username: 'butter_bridge',
                         avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
                         name: 'jonny'
@@ -78,16 +77,16 @@ describe("northcoders news api", () => {
     });
 
     describe('/api/articles/:article_id', () => {
-        test('GET 200 - responds with an array of a given article, including a count of how many comments the article has', () => {
+        test('GET 200 - responds with an object of a given article, including a count of how many comments the article has', () => {
             return request(app)
                 .get('/api/articles/1')
                 .expect(200)
                 .then(response => {
-                    expect(response.body.article.length).toEqual(1);
-                    expect(response.body).toMatchObject({ article: expect.any(Array) })
-                    expect(Object.keys(response.body.article[0])).toEqual(expect.arrayContaining(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at', 'comment_count']))
+                    console.log(response.body)
+                    expect(response.body).toMatchObject({ article: expect.any(Object) })
+                    expect(Object.keys(response.body.article)).toEqual(expect.objectContaining(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at', 'comment_count']))
 
-                    expect(response.body.article[0]).toEqual({
+                    expect(response.body.article).toEqual({
                         article_id: 1,
                         title: 'Living in the shadow of a great man',
                         body: 'I find this existence challenging',
@@ -105,12 +104,11 @@ describe("northcoders news api", () => {
                 .get('/api/articles/3')
                 .expect(200)
                 .then(response => {
-                    expect(response.body.article[0].comment_count).toEqual('0');
+                    console.log(response.body)
+                    expect(response.body.article.comment_count).toEqual('0');
                 })
         });
 
-        // 404 there is nothing wrong with the request it just doesn't exist.
-        // see example from the lecture on Tuesday for a better approach to this.
         test('GET 404 - responds with 404 custom error the article_id does not exist', () => {
             return request(app)
                 .get('/api/articles/100')
@@ -338,13 +336,12 @@ describe("northcoders news api", () => {
                 })
         });
 
-        xtest('GET 404 - responds with 404 when the author is not in the database', () => {
+        test('GET 404 - responds with 404 when the author is not in the database', () => {
             return request(app)
                 .get('/api/articles?username=bilbo_baggins')
                 .expect(404)
                 .then(response => {
-                    console.log(response.body)
-                    expect(response.body.msg).toEqual('User not found!');
+                    expect(response.body.msg).toEqual('bilbo_baggins? No articles found!');
                 });
         });
 
@@ -353,27 +350,25 @@ describe("northcoders news api", () => {
                 .get('/api/articles?topic=mushrooms')
                 .expect(404)
                 .then(response => {
-                    expect(response.body.msg).toEqual('Article not found!');
+                    expect(response.body.msg).toEqual('mushrooms? No articles found!');
                 });
         });
 
-        // could be more specific on the message 'username has not posted any articles'
         test('GET 404 - responds with 404 when the author has not posted any articles', () => {
             return request(app)
                 .get('/api/articles?username=lurker')
                 .expect(404)
                 .then(response => {
-                    expect(response.body.msg).toEqual('Article not found!');
+                    expect(response.body.msg).toEqual('No articles yet!');
                 });
         });
 
-        // again could be more specific with the message - 'no articles for this topic'
         test('GET 404 - responds with 404 when there are no articles for a valid topic', () => {
             return request(app)
                 .get('/api/articles?topic=paper')
                 .expect(404)
                 .then(response => {
-                    expect(response.body.msg).toEqual('Article not found!');
+                    expect(response.body.msg).toEqual('No articles yet!');
                 });
         });
 
@@ -644,8 +639,5 @@ describe("northcoders news api", () => {
         });
 
     }); // end of /api/comments/:comment_id
-
-
-
 
 }); // end of all tests
