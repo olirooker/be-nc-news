@@ -61,7 +61,7 @@ exports.removeArticleById = (articleId) => {
 exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) => {
 
     return connection
-        .select('articles.author', 'title', 'articles.article_id', 'topic', 'articles.created_at', 'articles.votes')
+        .select('articles.author', 'title', 'articles.body', 'articles.article_id', 'topic', 'articles.created_at', 'articles.votes')
         .count('comments.article_id AS comment_count')
         .from('articles')
         .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
@@ -88,5 +88,25 @@ exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) 
             }
             else return response[0]
         })
+};
+
+exports.addArticle = (newArticle) => {
+
+    const articleBuilder = {
+        title: newArticle.title,
+        body: newArticle.body,
+        topic: newArticle.topic,
+        author: newArticle.username,
+        created_at: new Date()
+    };
+
+    return connection
+        .insert(articleBuilder)
+        .into('articles')
+        .returning('*')
+        .then(postedArticle => {
+            return postedArticle[0];
+        })
+
 };
 

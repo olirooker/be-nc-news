@@ -1,4 +1,5 @@
-const { fetchArticleById, updateArticleVotesById, removeArticleById, fetchAllArticles } = require('../models/articles_model')
+const { fetchArticleById, updateArticleVotesById, removeArticleById, fetchAllArticles, addArticle } = require('../models/articles_model');
+const { addCommentToArticleById } = require('../models/comments_model');
 const { checkOrderQuery } = require('./utils')
 
 
@@ -50,4 +51,13 @@ exports.getAllArticles = (req, res, next) => {
             })
             .catch(next)
     }
+};
+
+exports.postArticle = (req, res, next) => {
+
+    const newArticle = req.body;
+    addArticle(newArticle).then(postedArticle => {
+        res.status(201).send({ postedArticle })
+    })
+        .catch(next)
 };

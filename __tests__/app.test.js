@@ -267,7 +267,7 @@ describe("northcoders news api", () => {
                 .then(response => {
                     expect(response.body.articles.length).toEqual(12);
                     expect(response.body).toMatchObject({ articles: expect.any(Array) })
-                    expect(Object.keys(response.body.articles[0])).toEqual(expect.arrayContaining(['article_id', 'title', 'votes', 'topic', 'author', 'created_at', 'comment_count']))
+                    expect(Object.keys(response.body.articles[0])).toEqual(expect.arrayContaining(['author', 'title', 'body', 'article_id', 'topic', 'created_at', 'votes', 'comment_count']))
 
                     expect(response.body.articles).toBeSortedBy('created_at', { coerce: true });
                 });
@@ -370,6 +370,43 @@ describe("northcoders news api", () => {
                 .then(response => {
                     expect(response.body.msg).toEqual('No articles yet!');
                 });
+        });
+
+        test('POST 201 - accepts a new comment object and responds with the posted article', () => {
+
+            const newArticle = {
+                username: 'icellusedkars',
+                topic: 'cats',
+                title: 'Can cats and dogs get along?',
+                body: 'Short answer, yes!'
+            }
+
+            return request(app)
+                .post('/api/articles')
+                .send(newArticle)
+                .expect(201)
+                .then(response => {
+                    expect(response.body).toMatchObject({ postedArticle: expect.any(Object) });
+                    expect(Object.keys(response.body.postedArticle)).toEqual(expect.arrayContaining(['author', 'title', 'body', 'article_id', 'topic', 'created_at', 'votes']));
+                })
+
+        });
+
+        test.only('POST 404 - response with 404 if the topic is not in the database', () => {
+            const newArticle = {
+                username: 'icellusedkars',
+                topic: 'dogs',
+                title: 'Can cats and dogs get along?',
+                body: 'Short answer, yes!'
+            }
+
+            return request(app)
+                .post('/api/articles')
+                .send(newArticle)
+                .expect(404)
+                .then(response => {
+                    console.log(response.body)
+                })
         });
 
     });
@@ -478,9 +515,8 @@ describe("northcoders news api", () => {
                 .send(newComment)
                 .expect(201)
                 .then(response => {
-                    expect(response.body.postedComment.length).toEqual(1);
-                    expect(response.body).toMatchObject({ postedComment: expect.any(Array) })
-                    expect(Object.keys(response.body.postedComment[0])).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']))
+                    expect(response.body).toMatchObject({ postedComment: expect.any(Object) })
+                    expect(Object.keys(response.body.postedComment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']))
 
                     // the new Date() creates different times so this test fails
 
@@ -553,7 +589,8 @@ describe("northcoders news api", () => {
                 .send(newComment)
                 .expect(201)
                 .then(response => {
-                    expect(Object.keys(response.body.postedComment[0])).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']))
+                    console.log(response.body)
+                    expect(Object.keys(response.body.postedComment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']))
                 });
         });
 
@@ -576,9 +613,9 @@ describe("northcoders news api", () => {
                 .expect(201)
                 .then(response => {
                     // assert the votes have increased by the given number
-                    expect(response.body.comment[0].votes).toEqual(-99);
+                    expect(response.body.comment.votes).toEqual(-99);
                     // assert the full updated comment is returned
-                    expect(response.body.comment[0]).toEqual({
+                    expect(response.body.comment).toEqual({
                         comment_id: 4,
                         author: 'icellusedkars',
                         article_id: 1,
@@ -600,9 +637,9 @@ describe("northcoders news api", () => {
                 .expect(201)
                 .then(response => {
                     // assert the votes have decreased by the given number
-                    expect(response.body.comment[0].votes).toEqual(-101);
+                    expect(response.body.comment.votes).toEqual(-101);
                     // assert the full updated comment is returned
-                    expect(response.body.comment[0]).toEqual({
+                    expect(response.body.comment).toEqual({
                         comment_id: 4,
                         author: 'icellusedkars',
                         article_id: 1,
@@ -624,7 +661,7 @@ describe("northcoders news api", () => {
                         .get('/api/articles/1')
                         .expect(200)
                         .then(response => {
-                            expect(response.body.article[0].comment_count).toEqual('12');
+                            expect(response.body.article.comment_count).toEqual('12');
                         })
                 })
         });

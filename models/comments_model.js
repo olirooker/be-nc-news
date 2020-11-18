@@ -34,7 +34,7 @@ exports.addCommentToArticleById = (username, body, articleId) => {
             .into('comments')
             .returning('*')
             .then(postedComment => {
-                return postedComment
+                return postedComment[0]
             })
     }
 };
@@ -51,7 +51,7 @@ exports.updateCommentVotesById = (commentId, votesToAdd) => {
         .increment('votes', votesToAdd.inc_votes)
         .returning('*')
         .then(updatedComment => {
-            return updatedComment
+            return updatedComment[0]
         })
 };
 
