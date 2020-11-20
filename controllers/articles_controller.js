@@ -33,12 +33,9 @@ exports.deleteArticleById = (req, res, next) => {
         .catch(next)
 };
 
-
-
 // ---------- All Articles Controller ---------- //
 
 exports.getAllArticles = (req, res, next) => {
-
     const { sort_by: sortBy, order, username, topic } = req.query
 
     if (!checkOrderQuery(order)) {
@@ -54,7 +51,6 @@ exports.getAllArticles = (req, res, next) => {
 };
 
 exports.postArticle = (req, res, next) => {
-
     const newArticle = req.body;
     addArticle(newArticle).then(postedArticle => {
         res.status(201).send({ postedArticle })

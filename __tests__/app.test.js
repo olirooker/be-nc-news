@@ -3,9 +3,7 @@ const app = require("../app")
 const request = require("supertest");
 const endpoints = require('../endpoints.json')
 
-
 describe("northcoders news api", () => {
-    // hooks
     afterAll(() => {
         return connection.destroy();
     });
@@ -19,15 +17,10 @@ describe("northcoders news api", () => {
                 .get('/api/topics')
                 .expect(200)
                 .then(response => {
-                    // assert the response has the correct number of rows
                     expect(response.body.topics.length).toEqual(3);
-                    // assert the response is the correct shape
                     expect(response.body).toMatchObject({ topics: expect.any(Array) })
-                    // assert the response has the correct properties
                     expect(Object.keys(response.body.topics[0])).toEqual(expect.arrayContaining(['description', 'slug']))
 
-                    // is it better to have the above assertions or one like below?
-                    // assert the response
                     expect(response.body).toEqual({
                         "topics": [
                             {
@@ -61,7 +54,7 @@ describe("northcoders news api", () => {
                     console.log(response.body)
                 })
         });
-    })
+    });
 
     describe('/api/users/:username', () => {
         test('GET 200 - responds with an object of a given user', () => {
@@ -142,10 +135,6 @@ describe("northcoders news api", () => {
         });
 
         test('PATCH 201 - increase vote property of an article. Accepts an object with votes property, responds with the updated article', () => {
-
-            // /api/articles/1 has 100 votes
-            // should return 101
-
             const votesToPatch = {
                 votes: 1
             };
@@ -155,9 +144,7 @@ describe("northcoders news api", () => {
                 .send(votesToPatch)
                 .expect(201)
                 .then(response => {
-                    // assert the votes have increased by the given number
                     expect(response.body.article[0].votes).toEqual(101);
-                    // assert the full updated article is returned
                     expect(response.body.article[0]).toEqual({
                         article_id: 1,
                         title: 'Living in the shadow of a great man',
@@ -171,7 +158,6 @@ describe("northcoders news api", () => {
         });
 
         test('PATCH 201 - decrease vote property of an article. Decrease the votes passing through a negative number', () => {
-
             const votesToPatch = {
                 votes: -1
             };
@@ -195,8 +181,6 @@ describe("northcoders news api", () => {
         });
 
         test('PATCH 400 - No votes on the req body - the property is not defined', () => {
-            //  route to handleCustomErrors
-
             const votesToPatch = { name: 'Oli' };
 
             return request(app)
@@ -209,7 +193,6 @@ describe("northcoders news api", () => {
         });
 
         test('PATCH 400 - responds with 400 bad request when provided with an invalid value on the votes object', () => {
-            //handled by handlePSQLErrors
             const votesToPatch = {
                 votes: 'cats'
             };
@@ -224,7 +207,6 @@ describe("northcoders news api", () => {
         });
 
         test('PATCH 201 - only patches the votes property even if there is another property on the request', () => {
-            // this just ignores the other property as the model can only patch the votes property and nothing else.
             const votesToPatch = {
                 votes: 5,
                 name: 'Mitch'
@@ -249,7 +231,6 @@ describe("northcoders news api", () => {
         });
 
         test('DELETE 204 - removes an article by id', () => {
-            // what happens onDelete??
             return request(app)
                 .delete('/api/articles/1')
                 .expect(204)
@@ -340,7 +321,6 @@ describe("northcoders news api", () => {
         });
 
         test('GET 400 - responds with an 400 when ordering by an invalid value', () => {
-
             return request(app)
                 .get('/api/articles?order=cats')
                 .expect(400)
@@ -387,7 +367,6 @@ describe("northcoders news api", () => {
         });
 
         test('POST 201 - accepts a new comment object and responds with the posted article', () => {
-
             const newArticle = {
                 username: 'icellusedkars',
                 topic: 'cats',
@@ -403,7 +382,6 @@ describe("northcoders news api", () => {
                     expect(response.body).toMatchObject({ postedArticle: expect.any(Object) });
                     expect(Object.keys(response.body.postedArticle)).toEqual(expect.arrayContaining(['author', 'title', 'body', 'article_id', 'topic', 'created_at', 'votes']));
                 })
-
         });
 
         test('POST 404 - response with 404 if the topic is not in the database', () => {
@@ -526,7 +504,6 @@ describe("northcoders news api", () => {
     });
 
     describe('Unavailable Routes and Invalid Methods', () => {
-        // 404 there is nothing wrong with the request it just doesn't exist.
         test('GET 404 - responds with 404 custom error when route is not available', () => {
             return request(app)
                 .get('/not-a-route')
@@ -588,7 +565,6 @@ describe("northcoders news api", () => {
         });
 
         test('GET 200 - responds with an array of comments order ascending when queried', () => {
-
             return request(app)
                 .get('/api/articles/1/comments?order=asc')
                 .expect(200)
@@ -608,7 +584,6 @@ describe("northcoders news api", () => {
         // });
 
         test('GET 200 - responds with comments array with chained queries. ordered and sort by', () => {
-
             return request(app)
                 .get('/api/articles/1/comments?sort_by=author&order=asc')
                 .expect(200)
@@ -618,7 +593,6 @@ describe("northcoders news api", () => {
         });
 
         test('POST 201 - accepts a new comment object and responds with the posted comment', () => {
-
             const newComment = {
                 username: 'icellusedkars',
                 body: 'I don\'t know half of you half as well as I should like; and I like less than half of you half as well as you deserve.'
@@ -635,7 +609,6 @@ describe("northcoders news api", () => {
         });
 
         test('POST 404 - responds with a 404 if the username is not a user', () => {
-
             const newComment = {
                 username: 'Bilbo_Baggins',
                 body: 'I don\'t know half of you half as well as I should like; and I like less than half of you half as well as you deserve.'
@@ -651,7 +624,6 @@ describe("northcoders news api", () => {
         });
 
         test('POST 400 - responds with a 400 when the username property is not defined', () => {
-
             const newComment = {
                 body: 'I don\'t know half of you half as well as I should like; and I like less than half of you half as well as you deserve.'
             };
@@ -680,7 +652,6 @@ describe("northcoders news api", () => {
         });
 
         test('POST 201 - additional properties on the request have no impact on the post', () => {
-
             const newComment = {
                 username: 'icellusedkars',
                 body: 'I don\'t know half of you half as well as I should like; and I like less than half of you half as well as you deserve.',
@@ -715,9 +686,7 @@ describe("northcoders news api", () => {
                 .send(votesToPatch)
                 .expect(201)
                 .then(response => {
-                    // assert the votes have increased by the given number
                     expect(response.body.comment.votes).toEqual(-99);
-                    // assert the full updated comment is returned
                     expect(response.body.comment).toEqual({
                         comment_id: 4,
                         author: 'icellusedkars',
@@ -739,9 +708,7 @@ describe("northcoders news api", () => {
                 .send(votesToPatch)
                 .expect(201)
                 .then(response => {
-                    // assert the votes have decreased by the given number
                     expect(response.body.comment.votes).toEqual(-101);
-                    // assert the full updated comment is returned
                     expect(response.body.comment).toEqual({
                         comment_id: 4,
                         author: 'icellusedkars',

@@ -6,10 +6,8 @@ const { send404, handleServerErrors, handlePSQLErrors, handleCustomErrors } = re
 app.use(express.json())
 app.use('/api', apiRouter)
 
-// not sure if this is a good way to handle 404s and 405s
-app.all('/*', send404) // endpoints that do not exist
+app.all('/*', send404)
 
-// error handling
 app.use(handleCustomErrors)
 app.use(handlePSQLErrors)
 app.use(handleServerErrors)

@@ -7,7 +7,7 @@ exports.fetchTopics = () => {
         .then(topicRows => {
             return topicRows;
         })
-}
+};
 
 exports.addTopic = (newTopic) => {
     return connection

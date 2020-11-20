@@ -1,14 +1,9 @@
 const connection = require("../db/connection");
 const { checkExists } = require('./utils')
 
-
 // ---------- Articles By ID ---------- //
 
 exports.fetchArticleById = (articleId) => {
-    // this has to be a leftJoin because otherwise
-    // the database won't return any article without
-    // comments.
-
     return connection
         .select('articles.*')
         .count('comments.article_id AS comment_count')
@@ -46,19 +41,15 @@ exports.removeArticleById = (articleId) => {
         .where('article_id', '=', articleId)
         .delete()
         .then(deleteCount => {
-            // delete count returns a number
             if (deleteCount === 0) {
                 return Promise.reject({ status: 404, msg: 'Article not found! Cannot delete.' })
             }
         })
 };
 
-
-
 // ---------- All Articles Model ---------- //
 
 exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) => {
-
     return connection
         .select('articles.author', 'title', 'articles.body', 'articles.article_id', 'topic', 'articles.created_at', 'articles.votes')
         .count('comments.article_id AS comment_count')
@@ -90,11 +81,10 @@ exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) 
 };
 
 exports.addArticle = (newArticle) => {
-
     if (newArticle.title === undefined ||
         newArticle.body === undefined) {
         return Promise.reject({ status: 400, msg: 'Missing information on the request!' })
-    }
+    };
 
     const articleBuilder = {
         title: newArticle.title,
@@ -110,6 +100,5 @@ exports.addArticle = (newArticle) => {
         .then(postedArticle => {
             return postedArticle[0];
         })
-
 };
 

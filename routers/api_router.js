@@ -1,5 +1,4 @@
 const apiRouter = require('express').Router();
-
 const topicsRouter = require('./topics_router')
 const usersRouter = require('./users_router')
 const articlesRouter = require('./articles_router')
