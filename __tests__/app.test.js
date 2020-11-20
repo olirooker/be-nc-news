@@ -46,6 +46,21 @@ describe("northcoders news api", () => {
                     });
                 })
         })
+
+        test.only('POST 201 - request body accepts a new topic object and responds with the posted topic', () => {
+            const newTopic = {
+                slug: 'dogs',
+                description: 'Not cats'
+            }
+
+            return request(app)
+                .post('/api/topics')
+                .send(newTopic)
+                .expect(201)
+                .then(response => {
+                    console.log(response.body)
+                })
+        });
     })
 
     describe('/api/users/:username', () => {
@@ -766,7 +781,7 @@ describe("northcoders news api", () => {
     }); // end of /api/comments/:comment_id
 
     describe('/api', () => {
-        test.only('GET 200 - responds with a JSON of all the available endpoints', () => {
+        test('GET 200 - responds with a JSON of all the available endpoints', () => {
             return request(app)
                 .get('/api')
                 .expect(200)
@@ -775,6 +790,7 @@ describe("northcoders news api", () => {
                 })
         });
     });
+
 
 
 

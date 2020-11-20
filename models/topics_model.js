@@ -8,3 +8,13 @@ exports.fetchTopics = () => {
             return topicRows;
         })
 }
+
+exports.addTopic = (newTopic) => {
+    return connection
+        .insert(newTopic)
+        .into('topics')
+        .returning('*')
+        .then(postedTopic => {
+            return postedTopic[0];
+        })
+};

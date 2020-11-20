@@ -1,5 +1,4 @@
 const { fetchCommentsForArticle, addCommentToArticleById, updateCommentVotesById, removeCommentById } = require('../models/comments_model');
-const { fetchUsersByUsername } = require('../models/users_model');
 
 
 // ---------- Comments By Article ID ---------- //
