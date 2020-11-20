@@ -43,8 +43,6 @@ Bear in mind, handling bad inputs from clients doesn't necessarily have to lead 
 
 ### GET `/api/topics`
 
-Added:
-
 - ✅ 404s and 405s covered above
 
 ### GET `/api/users/:username`
@@ -66,8 +64,6 @@ Added:
 
 ### Other `/api/articles/:article_id`
 
-Added:
-
 - order request not equal to asc or desc
 
 ### POST `/api/articles/:article_id/comments`
@@ -79,7 +75,6 @@ Added:
 
 ### GET `/api/articles/:article_id/comments`
 
-Added:
 - ✅ sort by an invalid column
 - `order` !== "asc" / "desc"
 
@@ -91,20 +86,15 @@ Added:
   - ✅  `author` / `topic` that is not in the database
   - ✅  `author` / `topic` that exists but does not have any articles associated with it - could be better
 
-  Added:
 - ✅ request to delete an article that doesn't exist
 
 ### PATCH `/api/comments/:comment_id`
-
-Added:
 
 - user is not in the database
 - username not defined
 - additonal properties on the object
 
 ### DELETE `/api/comments/:comment_id`
-
-Added:
 
 - ✅ attempt to delete a comment that doesn't exist
 

@@ -1,6 +1,5 @@
 const connection = require("../db/connection");
-const articlesRouter = require("../routers/articles_router");
-const { checkUserExists, checkExists } = require('./utils')
+const { checkExists } = require('./utils')
 
 
 // ---------- Articles By ID ---------- //
@@ -92,12 +91,16 @@ exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) 
 
 exports.addArticle = (newArticle) => {
 
+    if (newArticle.title === undefined ||
+        newArticle.body === undefined) {
+        return Promise.reject({ status: 400, msg: 'Missing information on the request!' })
+    }
+
     const articleBuilder = {
         title: newArticle.title,
         body: newArticle.body,
         topic: newArticle.topic,
-        author: newArticle.username,
-        created_at: new Date()
+        author: newArticle.username
     };
 
     return connection

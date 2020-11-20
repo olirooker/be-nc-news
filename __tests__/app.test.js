@@ -392,7 +392,7 @@ describe("northcoders news api", () => {
 
         });
 
-        test.only('POST 404 - response with 404 if the topic is not in the database', () => {
+        test('POST 404 - response with 404 if the topic is not in the database', () => {
             const newArticle = {
                 username: 'icellusedkars',
                 topic: 'dogs',
@@ -405,7 +405,107 @@ describe("northcoders news api", () => {
                 .send(newArticle)
                 .expect(404)
                 .then(response => {
-                    console.log(response.body)
+                    expect(response.body.msg).toEqual('Not found!');
+                })
+        });
+
+        test('POST 404 - responds with 404 if the username is not in the database', () => {
+            const newArticle = {
+                username: 'bilbo_baggins',
+                topic: 'paper',
+                title: 'The best paper grades to start a novel',
+                body: 'Starting a novel with ink and quill is difficult so make sure you have the right paper!'
+            }
+
+            return request(app)
+                .post('/api/articles')
+                .send(newArticle)
+                .expect(404)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Not found!');
+                })
+        });
+
+        test('POST 400 - responds with 400 if the username is not provided in the request', () => {
+            const newArticle = {
+                topic: 'paper',
+                title: 'The best paper grades to start a novel',
+                body: 'Starting a novel with ink and quill is difficult so make sure you have the right paper!'
+            }
+
+            return request(app)
+                .post('/api/articles')
+                .send(newArticle)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Bad request');
+                })
+        });
+
+        test('POST 400 - responds with 400 if the topic is not provided in the request', () => {
+            const newArticle = {
+                username: 'bilbo_baggins',
+                title: 'The best paper grades to start a novel',
+                body: 'Starting a novel with ink and quill is difficult so make sure you have the right paper!'
+            }
+
+            return request(app)
+                .post('/api/articles')
+                .send(newArticle)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Bad request');
+                })
+        });
+
+        test('POST 400 - responds with 400 if the title is not provided in the request', () => {
+            const newArticle = {
+                username: 'bilbo_baggins',
+                topic: 'paper',
+                body: 'Starting a novel with ink and quill is difficult so make sure you have the right paper!'
+            }
+
+            return request(app)
+                .post('/api/articles')
+                .send(newArticle)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Missing information on the request!');
+                })
+        });
+
+        test('POST 400 - responds with 400 if the body is not provided in the request', () => {
+            const newArticle = {
+                username: 'bilbo_baggins',
+                topic: 'paper',
+                title: 'The best paper grades to start a novel'
+            }
+
+            return request(app)
+                .post('/api/articles')
+                .send(newArticle)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Missing information on the request!');
+                })
+        });
+
+        test('POST 201 - ignores any additional properties on the request body', () => {
+            const newArticle = {
+                username: 'icellusedkars',
+                topic: 'cats',
+                title: 'Can cats and dogs get along?',
+                body: 'Short answer, yes!',
+                extra: 'content'
+            }
+
+            return request(app)
+                .post('/api/articles')
+                .send(newArticle)
+                .expect(201)
+                .then(response => {
+                    expect(response.body).toMatchObject({ postedArticle: expect.any(Object) });
+                    expect(Object.keys(response.body.postedArticle)).toEqual(expect.arrayContaining(['author', 'title', 'body', 'article_id', 'topic', 'created_at', 'votes']));
                 })
         });
 
@@ -517,17 +617,6 @@ describe("northcoders news api", () => {
                 .then(response => {
                     expect(response.body).toMatchObject({ postedComment: expect.any(Object) })
                     expect(Object.keys(response.body.postedComment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']))
-
-                    // the new Date() creates different times so this test fails
-
-                    // expect(response.body.postedComment[0]).toEqual({
-                    //     comment_id: 19,
-                    //     author: 'icellusedkars',
-                    //     article_id: 3,
-                    //     votes: 0,
-                    //     created_at: new Date(),
-                    //     body: "I don't know half of you half as well as I should like; and I like less than half of you half as well as you deserve."
-                    // });
                 })
         });
 
@@ -676,5 +765,19 @@ describe("northcoders news api", () => {
         });
 
     }); // end of /api/comments/:comment_id
+
+    // describe('/api', () => {
+    //     test.only('GET 200', () => {
+    //         return request(app)
+    //             .get('/api')
+    //             .expect(200)
+    //             .then(response => {
+    //                 console.log(response.body)
+    //             })
+    //     });
+    // });
+
+
+
 
 }); // end of all tests
