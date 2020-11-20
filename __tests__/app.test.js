@@ -1,8 +1,7 @@
 const connection = require("../db/connection")
 const app = require("../app")
 const request = require("supertest");
-// const { response } = require("express");
-// line 4 appeared - what is this?
+const endpoints = require('../endpoints.json')
 
 
 describe("northcoders news api", () => {
@@ -766,16 +765,18 @@ describe("northcoders news api", () => {
 
     }); // end of /api/comments/:comment_id
 
-    // describe('/api', () => {
-    //     test.only('GET 200', () => {
-    //         return request(app)
-    //             .get('/api')
-    //             .expect(200)
-    //             .then(response => {
-    //                 console.log(response.body)
-    //             })
-    //     });
-    // });
+    describe('/api', () => {
+        test.only('GET 200 - responds with a JSON of all the available endpoints', () => {
+            return request(app)
+                .get('/api')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.endpoints).toEqual(endpoints);
+                })
+        });
+    });
+
+
 
 
 

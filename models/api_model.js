@@ -2,5 +2,5 @@ const connection = require("../db/connection")
 const endpoints = require('../endpoints.json')
 
 exports.fetchAllEndpoints = () => {
-    // return endpoints;
+    return Promise.resolve(endpoints)
 };
