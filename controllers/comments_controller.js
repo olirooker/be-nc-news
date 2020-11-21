@@ -10,29 +10,22 @@ exports.getCommentsForArticle = (req, res, next) => {
     if (!checkOrderQuery(order)) {
         next({ status: 400, msg: 'Bad request: Invalid order query' })
     }
-    fetchCommentsForArticle(sortBy, order, limit, articleId).then(comments => {
-        res.status(200).send({ comments })
-    })
-        .catch(next)
+    else {
+        fetchCommentsForArticle(sortBy, order, limit, articleId).then(comments => {
+            res.status(200).send({ comments })
+        })
+            .catch(next)
+    }
 };
 
 exports.postCommentToArticleById = (req, res, next) => {
-
     const articleId = req.params.article_id
-    const username = req.body.username
-    const body = req.body.body
-
-    // fetchUsersByUsername(username)
-    //     .then(username => {
-
+    const { username, body } = req.body
     addCommentToArticleById(username, body, articleId)
         .then(postedComment => {
             res.status(201).send({ postedComment })
         })
         .catch(next)
-
-    // })
-    // .catch (next)
 };
 
 
@@ -40,10 +33,8 @@ exports.postCommentToArticleById = (req, res, next) => {
 // ---------- Comments Endpoints ---------- //
 
 exports.patchCommentVotesById = (req, res, next) => {
-
     const commentId = req.params.comment_id
     const votesToAdd = req.body
-
     updateCommentVotesById(commentId, votesToAdd).then(comment => {
         res.status(201).send({ comment })
     })
@@ -51,12 +42,9 @@ exports.patchCommentVotesById = (req, res, next) => {
 };
 
 exports.deleteCommentById = (req, res, next) => {
-
     const commentId = req.params.comment_id
-
     removeCommentById(commentId).then(() => {
         res.status(204).send()
     })
         .catch(next)
-
 };

@@ -642,7 +642,7 @@ describe("northcoders news api", () => {
                 })
         });
 
-        xtest('GET 400 - responds with an 400 when ordering by an invalid value', () => {
+        test('GET 400 - responds with an 400 when ordering by an invalid value', () => {
             return request(app)
                 .get('/api/articles/1/comments?order=cats')
                 .expect(400)
@@ -747,8 +747,6 @@ describe("northcoders news api", () => {
 
         // next test about invalid data types on the username and body properties
         // the data type should be 'text' - what is invalid on text
-
-
 
     }); // end of /api/articles/:article_id/comments
 
