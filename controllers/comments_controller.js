@@ -1,19 +1,16 @@
 const { fetchCommentsForArticle, addCommentToArticleById, updateCommentVotesById, removeCommentById } = require('../models/comments_model');
-
+const { checkOrderQuery } = require('./utils')
 
 // ---------- Comments By Article ID ---------- //
 
 exports.getCommentsForArticle = (req, res, next) => {
     const articleId = req.params.article_id
-    const sortBy = req.query.sort_by
-    const order = req.query.order
+    const { sort_by: sortBy, order, limit } = req.query
 
-    // console.log(order, '<<<<< controller')
-
-    // if (order !== 'asc' || order !== 'desc' || order !== undefined) return Promise.reject({ status: 400, msg: 'Invalid order request' })
-    //     .catch(next)
-
-    fetchCommentsForArticle(sortBy, order, articleId).then(comments => {
+    if (!checkOrderQuery(order)) {
+        next({ status: 400, msg: 'Bad request: Invalid order query' })
+    }
+    fetchCommentsForArticle(sortBy, order, limit, articleId).then(comments => {
         res.status(200).send({ comments })
     })
         .catch(next)

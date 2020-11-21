@@ -572,8 +572,6 @@ describe("northcoders news api", () => {
                     expect(response.body.articles.length).toEqual(10);
                 })
         });
-
-
     });
 
     describe('Unavailable Routes and Invalid Methods', () => {
@@ -597,13 +595,11 @@ describe("northcoders news api", () => {
     });
 
     describe('/api/articles/:article_id/comments', () => {
-
         test('GET 200 - responds with an array of comments for the given article_id', () => {
             return request(app)
                 .get('/api/articles/1/comments')
                 .expect(200)
                 .then(response => {
-                    expect(response.body.comments.length).toEqual(13);
                     expect(response.body).toMatchObject({ comments: expect.any(Array) })
                     expect(Object.keys(response.body.comments[0])).toEqual(expect.arrayContaining(['comment_id', 'votes', 'created_at', 'author', 'body']))
                 })
@@ -646,15 +642,14 @@ describe("northcoders news api", () => {
                 })
         });
 
-        // test.only('GET 400 - responds with an 400 when ordering by an invalid value', () => {
-
-        //     return request(app)
-        //         .get('/api/articles/1/comments?order=cats')
-        //         .expect(400)
-        //         .then(response => {
-        //             expect(response.body.msg).toEqual('Invalid order request');
-        //         })
-        // });
+        xtest('GET 400 - responds with an 400 when ordering by an invalid value', () => {
+            return request(app)
+                .get('/api/articles/1/comments?order=cats')
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Bad request: Invalid order query');
+                })
+        });
 
         test('GET 200 - responds with comments array with chained queries. ordered and sort by', () => {
             return request(app)
@@ -743,10 +738,10 @@ describe("northcoders news api", () => {
 
         test('GET 200 - responds with an array of comments limited to 10', () => {
             return request(app)
-                .get('/api/articles/2/comments')
+                .get('/api/articles/1/comments')
                 .expect(200)
                 .then(response => {
-                    expect(response.body.articles.length).toEqual(10);
+                    expect(response.body.comments.length).toEqual(10);
                 })
         });
 

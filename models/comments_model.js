@@ -3,21 +3,19 @@ const connection = require("../db/connection");
 
 // ---------- Comments By Article ID ---------- //
 
-exports.fetchCommentsForArticle = (sortBy = 'created_at', order = 'desc', articleId) => {
-
-    // console.log(order, '<<<<<< model')
+exports.fetchCommentsForArticle = (sortBy = 'created_at', order = 'desc', limit = 10, articleId) => {
     return connection
         .select('comment_id', 'votes', 'created_at', 'author', 'body')
         .from('comments')
         .where('article_id', '=', articleId)
         .orderBy(sortBy, order)
+        .limit(limit)
         .then(commentsRows => {
             return commentsRows
         })
 };
 
 exports.addCommentToArticleById = (username, body, articleId) => {
-
     if (body === undefined || username === undefined) {
         return Promise.reject({ status: 400, msg: 'Missing information on the request!' })
     }
