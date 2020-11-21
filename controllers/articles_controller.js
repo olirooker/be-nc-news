@@ -36,13 +36,13 @@ exports.deleteArticleById = (req, res, next) => {
 // ---------- All Articles Controller ---------- //
 
 exports.getAllArticles = (req, res, next) => {
-    const { sort_by: sortBy, order, username, topic } = req.query
+    const { sort_by: sortBy, order, limit, username, topic } = req.query
 
     if (!checkOrderQuery(order)) {
         next({ status: 400, msg: 'Bad request: Invalid order query' })
     }
     else {
-        fetchAllArticles(sortBy, order, username, topic)
+        fetchAllArticles(sortBy, order, limit, username, topic)
             .then(articles => {
                 res.status(200).send({ articles })
             })

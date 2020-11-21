@@ -300,10 +300,10 @@ describe("northcoders news api", () => {
                 .expect(204)
                 .then(response => {
                     return request(app)
-                        .get('/api/articles')
-                        .expect(200)
+                        .get('/api/articles/1')
+                        .expect(404)
                         .then(response => {
-                            expect(response.body.articles.length).toEqual(11);
+                            expect(response.body.msg).toEqual('Article not found!');
                         })
                 })
         });
@@ -324,7 +324,6 @@ describe("northcoders news api", () => {
                 .get('/api/articles')
                 .expect(200)
                 .then(response => {
-                    expect(response.body.articles.length).toEqual(12);
                     expect(response.body).toMatchObject({ articles: expect.any(Array) })
                     expect(Object.keys(response.body.articles[0])).toEqual(expect.arrayContaining(['author', 'title', 'body', 'article_id', 'topic', 'created_at', 'votes', 'comment_count']))
 
@@ -565,6 +564,16 @@ describe("northcoders news api", () => {
                 })
         });
 
+        test('GET 200 - responds with an array of articles limited to 10', () => {
+            return request(app)
+                .get('/api/articles')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.articles.length).toEqual(10);
+                })
+        });
+
+
     });
 
     describe('Unavailable Routes and Invalid Methods', () => {
@@ -730,6 +739,15 @@ describe("northcoders news api", () => {
                     console.log(response.body)
                     expect(Object.keys(response.body.postedComment)).toEqual(expect.arrayContaining(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body']))
                 });
+        });
+
+        test('GET 200 - responds with an array of comments limited to 10', () => {
+            return request(app)
+                .get('/api/articles/2/comments')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.articles.length).toEqual(10);
+                })
         });
 
         // next test about invalid data types on the username and body properties
