@@ -40,7 +40,7 @@ describe("northcoders news api", () => {
                 })
         })
 
-        test.only('POST 201 - request body accepts a new topic object and responds with the posted topic', () => {
+        test('POST 201 - request body accepts a new topic object and responds with the posted topic', () => {
             const newTopic = {
                 slug: 'dogs',
                 description: 'Not cats'
@@ -51,8 +51,53 @@ describe("northcoders news api", () => {
                 .send(newTopic)
                 .expect(201)
                 .then(response => {
-                    console.log(response.body)
+                    expect(response.body).toMatchObject({ postedTopic: expect.any(Object) });
+                    expect(Object.keys(response.body.postedTopic)).toEqual(expect.arrayContaining(['slug', 'description']));
+                    expect(response.body.postedTopic).toEqual({ slug: 'dogs', description: 'Not cats' });
                 })
+        });
+
+        test('POST 400 - responds with 400 if the slug is not defined', () => {
+            const newTopic = {
+                description: 'Not cats'
+            };
+
+            return request(app)
+                .post('/api/topics')
+                .send(newTopic)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Bad request');
+                });
+        });
+
+        test('POST 400 - responds with 400 if the description is not defined', () => {
+            const newTopic = {
+                slug: 'dogs'
+            };
+
+            return request(app)
+                .post('/api/topics')
+                .send(newTopic)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Please include a description');
+                });
+        });
+
+        test('POST 400 - responds with 400 the requested topic to add already exists', () => {
+            const newTopic = {
+                slug: 'cats',
+                description: 'A rival cats page!'
+            };
+
+            return request(app)
+                .post('/api/topics')
+                .send(newTopic)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('This page already exists!');
+                });
         });
     });
 

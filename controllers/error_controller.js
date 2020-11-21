@@ -16,11 +16,15 @@ exports.handleCustomErrors = (err, req, res, next) => {
 exports.handlePSQLErrors = (err, req, res, next) => {
     const badReqCodes = ['22P02', '42703', '23502'];
     const notFoundCodes = ['23503'];
+    const alreadyExists = ['23505'];
     if (badReqCodes.includes(err.code)) {
         res.status(400).send({ msg: 'Bad request' });
     }
     else if (notFoundCodes.includes(err.code)) {
         res.status(404).send({ msg: 'Not found!' });
+    }
+    else if (alreadyExists.includes(err.code)) {
+        res.status(400).send({ msg: 'This page already exists!' })
     }
     else next(err)
 };
