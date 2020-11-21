@@ -24,7 +24,7 @@ exports.handlePSQLErrors = (err, req, res, next) => {
         res.status(404).send({ msg: 'Not found!' });
     }
     else if (alreadyExists.includes(err.code)) {
-        res.status(400).send({ msg: 'This page already exists!' })
+        res.status(400).send({ msg: 'This already exists!' })
     }
     else next(err)
 };

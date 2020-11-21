@@ -15,11 +15,16 @@ exports.addTopic = (newTopic) => {
         return Promise.reject({ status: 400, msg: 'Please include a description' })
     }
 
+    const formattedTopic = {
+        slug: newTopic.slug,
+        description: newTopic.description
+    };
+
     return connection
-        .insert(newTopic)
+        .insert(formattedTopic)
         .into('topics')
         .returning('*')
         .then(postedTopic => {
             return postedTopic[0];
-        })
+        });
 };

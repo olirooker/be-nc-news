@@ -1,7 +1,7 @@
 const connection = require("../db/connection")
 const app = require("../app")
 const request = require("supertest");
-const endpoints = require('../endpoints.json')
+const endpoints = require('../endpoints.json');
 
 describe("northcoders news api", () => {
     afterAll(() => {
@@ -96,7 +96,26 @@ describe("northcoders news api", () => {
                 .send(newTopic)
                 .expect(400)
                 .then(response => {
-                    expect(response.body.msg).toEqual('This page already exists!');
+                    expect(response.body.msg).toEqual('This already exists!');
+                });
+        });
+
+        test('POST 201 - ignores any additional properties on the request body', () => {
+            const newTopic = {
+                slug: 'dogs',
+                description: 'Not cats',
+                extra: 'content!'
+            };
+
+            return request(app)
+                .post('/api/topics')
+                .send(newTopic)
+                .expect(201)
+                .then(response => {
+                    expect(response.body.postedTopic).toEqual({
+                        slug: 'dogs',
+                        description: 'Not cats'
+                    });
                 });
         });
     });
@@ -696,7 +715,7 @@ describe("northcoders news api", () => {
                 })
         });
 
-        test('POST 201 - additional properties on the request have no impact on the post', () => {
+        test('POST 201 - ignores any additional properties on the request body', () => {
             const newComment = {
                 username: 'icellusedkars',
                 body: 'I don\'t know half of you half as well as I should like; and I like less than half of you half as well as you deserve.',
@@ -803,9 +822,147 @@ describe("northcoders news api", () => {
         });
     });
 
+    describe('/api/users', () => {
+        test('GET 200 - responds with an array of users', () => {
+            return request(app)
+                .get('/api/users')
+                .expect(200)
+                .then(response => {
+                    expect(response.body.users.length).toEqual(4);
+                    expect(response.body).toMatchObject({ users: expect.any(Array) });
+                    expect(Object.keys(response.body.users[0])).toEqual(expect.arrayContaining(['username', 'avatar_url', 'name']));
 
+                    expect(response.body).toEqual({
+                        users: [
+                            {
+                                username: 'butter_bridge',
+                                avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+                                name: 'jonny'
+                            },
+                            {
+                                username: 'icellusedkars',
+                                avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4',
+                                name: 'sam'
+                            },
+                            {
+                                username: 'rogersop',
+                                avatar_url: 'https://avatars2.githubusercontent.com/u/24394918?s=400&v=4',
+                                name: 'paul'
+                            },
+                            {
+                                username: 'lurker',
+                                avatar_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+                                name: 'do_nothing'
+                            }
+                        ]
+                    })
+                })
+        });
 
+        test('POST 201 - sends a new user object and responds with the new user added to the database', () => {
+            const newUser = {
+                username: 'the_gardener',
+                name: 'Samwise',
+                avatar_url: 'https://lthumb.lisimg.com/077/8432077.jpg?width=411&sharpen=true'
+            };
 
+            return request(app)
+                .post('/api/users')
+                .send(newUser)
+                .expect(201)
+                .then(response => {
+                    expect(response.body).toMatchObject({ postedUser: expect.any(Object) });
+                    expect(Object.keys(response.body.postedUser)).toEqual(expect.arrayContaining(['username', 'avatar_url', 'name']));
+                    expect(response.body.postedUser).toEqual({
+                        username: 'the_gardener',
+                        avatar_url: 'https://lthumb.lisimg.com/077/8432077.jpg?width=411&sharpen=true',
+                        name: 'Samwise'
+                    });
+                });
+        });
+
+        test('POST 400 - responds with 400 when username already exists', () => {
+            const newUser = {
+                username: 'icellusedkars',
+                name: 'Sam',
+                avatar_url: 'https://nerdist.com/wp-content/uploads/2020/07/maxresdefault.jpg'
+            };
+
+            return request(app)
+                .post('/api/users')
+                .send(newUser)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('This already exists!');
+                });
+        });
+
+        test('POST 400 - responds with 400 when username is not defined', () => {
+            const newUser = {
+                name: 'Samwise',
+                avatar_url: 'https://lthumb.lisimg.com/077/8432077.jpg?width=411&sharpen=true'
+            };
+
+            return request(app)
+                .post('/api/users')
+                .send(newUser)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Bad request');
+                });
+        });
+
+        test('POST 400 - responds with 400 when name is not defined', () => {
+            const newUser = {
+                username: 'the_gardener',
+                avatar_url: 'https://lthumb.lisimg.com/077/8432077.jpg?width=411&sharpen=true'
+            };
+
+            return request(app)
+                .post('/api/users')
+                .send(newUser)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Missing information on the request');
+                });
+        });
+
+        test('POST 400 - responds with 400 when avatar_url is not defined', () => {
+            const newUser = {
+                username: 'the_gardener',
+                name: 'Samwise'
+            };
+
+            return request(app)
+                .post('/api/users')
+                .send(newUser)
+                .expect(400)
+                .then(response => {
+                    expect(response.body.msg).toEqual('Missing information on the request');
+                });
+        });
+
+        test('POST 400 - ignores unnecessary content on the request body', () => {
+            const newUser = {
+                username: 'the_gardener',
+                name: 'Samwise',
+                avatar_url: 'https://lthumb.lisimg.com/077/8432077.jpg?width=411&sharpen=true',
+                extra: 'content!'
+            };
+
+            return request(app)
+                .post('/api/users')
+                .send(newUser)
+                .expect(201)
+                .then(response => {
+                    expect(response.body.postedUser).toEqual({
+                        username: 'the_gardener',
+                        avatar_url: 'https://lthumb.lisimg.com/077/8432077.jpg?width=411&sharpen=true',
+                        name: 'Samwise'
+                    });
+                });
+        });
+    });
 
 
 
