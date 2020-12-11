@@ -15,7 +15,9 @@ exports.getArticleById = (req, res, next) => {
 
 exports.patchArticleVotesById = (req, res, next) => {
     const articleId = req.params.article_id;
-    const voteChange = req.body.votes;
+    const voteChange = req.body.inc_votes;
+
+    console.log(voteChange)
 
     if (voteChange === undefined) next({ status: 400, msg: 'No votes on the request!' })
 

@@ -198,9 +198,9 @@ describe("northcoders news api", () => {
                 })
         });
 
-        test('PATCH 201 - increase vote property of an article. Accepts an object with votes property, responds with the updated article', () => {
+        test.only('PATCH 201 - increase vote property of an article. Accepts an object with votes property, responds with the updated article', () => {
             const votesToPatch = {
-                votes: 1
+                inc_votes: 1
             };
 
             return request(app)
@@ -223,7 +223,7 @@ describe("northcoders news api", () => {
 
         test('PATCH 201 - decrease vote property of an article. Decrease the votes passing through a negative number', () => {
             const votesToPatch = {
-                votes: -1
+                inc_votes: -1
             };
 
             return request(app)
