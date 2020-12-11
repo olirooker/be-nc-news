@@ -564,14 +564,14 @@ describe("northcoders news api", () => {
                 })
         });
 
-        test('GET 200 - responds with an array of articles limited to 10', () => {
-            return request(app)
-                .get('/api/articles')
-                .expect(200)
-                .then(response => {
-                    expect(response.body.articles.length).toEqual(10);
-                })
-        });
+        // test('GET 200 - responds with an array of articles limited to 10', () => {
+        //     return request(app)
+        //         .get('/api/articles')
+        //         .expect(200)
+        //         .then(response => {
+        //             expect(response.body.articles.length).toEqual(10);
+        //         })
+        // });
     });
 
     describe('Unavailable Routes and Invalid Methods', () => {

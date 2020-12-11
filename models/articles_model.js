@@ -49,7 +49,9 @@ exports.removeArticleById = (articleId) => {
 
 // ---------- All Articles Model ---------- //
 
-exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', limit = 10, user, topic) => {
+// .limit(limit) after order_by and limit=10 in the params
+
+exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', user, topic) => {
     return connection
         .select('articles.author', 'title', 'articles.body', 'articles.article_id', 'topic', 'articles.created_at', 'articles.votes')
         .count('comments.article_id AS comment_count')
@@ -65,7 +67,6 @@ exports.fetchAllArticles = (sortBy = 'created_at', order = 'desc', limit = 10, u
             }
         })
         .orderBy(sortBy, order)
-        .limit(limit)
         .then(articlesRows => {
             if (articlesRows.length === 0) {
                 return Promise.all([articlesRows, checkExists('users', 'username', user),
