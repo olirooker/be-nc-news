@@ -54,8 +54,8 @@ exports.getAllArticles = (req, res, next) => {
 
 exports.postArticle = (req, res, next) => {
     const newArticle = req.body;
-    addArticle(newArticle).then(postedArticle => {
-        res.status(201).send({ postedArticle })
+    addArticle(newArticle).then(article => {
+        res.status(201).send({ article })
     })
         .catch(next)
 };

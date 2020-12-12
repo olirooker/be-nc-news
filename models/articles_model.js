@@ -99,8 +99,8 @@ exports.addArticle = (newArticle) => {
         .insert(articleBuilder)
         .into('articles')
         .returning('*')
-        .then(postedArticle => {
-            return postedArticle[0];
+        .then(article => {
+            return article[0];
         })
 };
 
