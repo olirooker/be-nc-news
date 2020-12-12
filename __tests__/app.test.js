@@ -352,17 +352,17 @@ describe("northcoders news api", () => {
 
         test.only('GET 200 - responds with an array of articles written by the same author', () => {
             return request(app)
-                .get('/api/articles?username=jessjelly')
+                .get('/api/articles?username=icellusedkars')
                 .expect(200)
                 .then(response => {
-                    console.log(response.body.articles)
+                    // console.log(response.body.articles)
                     response.body.articles.forEach(article => {
-                        expect(article.author).toEqual('jessjelly');
+                        expect(article.author).toEqual('icellusedkars');
                     })
                 });
         });
 
-        test.only('GET 200 - responds with an array of articles filtered by topic', () => {
+        xtest('GET 200 - responds with an array of articles filtered by topic', () => {
             return request(app)
                 .get('/api/articles?topic=cats')
                 .expect(200)
@@ -402,7 +402,7 @@ describe("northcoders news api", () => {
                 });
         });
 
-        test.only('GET 404 - responds with 404 when the topic is not in the database', () => {
+        xtest('GET 404 - responds with 404 when the topic is not in the database', () => {
             return request(app)
                 .get('/api/articles?topic=mushrooms')
                 .expect(404)
@@ -411,7 +411,7 @@ describe("northcoders news api", () => {
                 });
         });
 
-        test.only('GET 404 - responds with 404 when the author has not posted any articles', () => {
+        xtest('GET 404 - responds with 404 when the author has not posted any articles', () => {
             return request(app)
                 .get('/api/articles?username=lurker')
                 .expect(404)
@@ -420,7 +420,7 @@ describe("northcoders news api", () => {
                 });
         });
 
-        test.only('GET 404 - responds with 404 when there are no articles for a valid topic', () => {
+        xtest('GET 404 - responds with 404 when there are no articles for a valid topic', () => {
             return request(app)
                 .get('/api/articles?topic=paper')
                 .expect(404)
@@ -442,8 +442,8 @@ describe("northcoders news api", () => {
                 .send(newArticle)
                 .expect(201)
                 .then(response => {
-                    expect(response.body).toMatchObject({ postedArticle: expect.any(Object) });
-                    expect(Object.keys(response.body.postedArticle)).toEqual(expect.arrayContaining(['author', 'title', 'body', 'article_id', 'topic', 'created_at', 'votes']));
+                    expect(response.body).toMatchObject({ article: expect.any(Object) });
+                    expect(Object.keys(response.body.article)).toEqual(expect.arrayContaining(['author', 'title', 'body', 'article_id', 'topic', 'created_at', 'votes']));
                 })
         });
 
