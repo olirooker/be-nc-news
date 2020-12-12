@@ -31,8 +31,8 @@ exports.addCommentToArticleById = (username, body, articleId) => {
             .insert(commentBuilder)
             .into('comments')
             .returning('*')
-            .then(postedComment => {
-                return postedComment[0]
+            .then(comment => {
+                return comment[0]
             })
     }
 };
